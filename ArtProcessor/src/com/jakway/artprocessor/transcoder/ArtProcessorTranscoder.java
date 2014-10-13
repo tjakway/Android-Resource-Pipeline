@@ -1,6 +1,5 @@
 package com.jakway.artprocessor.transcoder;
 
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,22 +8,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
-import org.apache.batik.swing.svg.JSVGComponent;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
-import org.apache.batik.util.SVGConstants;
-import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.svg.SVGDocument;
 
-import com.jakway.artprocessor.errorhandler.ArtProcessorErrorHandler;
 import com.jakway.artprocessor.errorhandler.TranscoderErrorHandler;
 import com.jakway.artprocessor.exception.ArtProcessorException;
-import com.jakway.artprocessor.file.FileSystemChecker;
 import com.jakway.artprocessor.svg.SVGValidator;
 
 public class ArtProcessorTranscoder
