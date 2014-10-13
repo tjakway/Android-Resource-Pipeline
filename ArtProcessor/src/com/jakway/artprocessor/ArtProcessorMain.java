@@ -17,8 +17,11 @@ import org.w3c.dom.Document;
 
 import com.jakway.artprocessor.errorhandler.ArtProcessorErrorHandler;
 import com.jakway.artprocessor.errorhandler.TerminatingArtProcessorErrorHandler;
+import com.jakway.artprocessor.errorhandler.TranscoderErrorHandler;
 import com.jakway.artprocessor.exception.ArtProcessorException;
 import com.jakway.artprocessor.file.FileSystemChecker;
+import com.jakway.artprocessor.svg.SVGValidator;
+import com.jakway.artprocessor.transcoder.ArtProcessorTranscoder;
 
 public class ArtProcessorMain implements org.apache.batik.transcoder.ErrorHandler
 {	
@@ -27,16 +30,19 @@ public class ArtProcessorMain implements org.apache.batik.transcoder.ErrorHandle
 	
 	public static void main(String args[]) throws TranscoderException, FileNotFoundException
 	{
-		File inputDir = null;
+		File inputDir = null,
+				outputDir = null;
 		
 		
 		FileSystemChecker checker = new FileSystemChecker(inputDir, new TerminatingArtProcessorErrorHandler("FileSystemChecker"));
 		
 		ArrayList<File> svgFiles = checker.checkFiles();
 		
-
+		SVGValidator validator = new SVGValidator(svgFiles, new TerminatingArtProcessorErrorHandler("SVGValidator"));
+		validator.validateSVGs();
 		
-		
+		ArtProcessorTranscoder transcoder = new ArtProcessorTranscoder(outputDir, svgFiles, new TranscoderErrorHandler("ArtProcessorTranscoder", outputDir));
+		transcoder.convertAndWriteSVGs();
 	}
 	
 	@Override

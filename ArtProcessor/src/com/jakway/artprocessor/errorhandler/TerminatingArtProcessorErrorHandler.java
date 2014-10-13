@@ -23,12 +23,21 @@ public class TerminatingArtProcessorErrorHandler implements ArtProcessorErrorHan
 	}
 	
 	/**
+	 * this method can be overridden by subclasses
+	 */
+	protected void beforeExit()
+	{
+		
+	}
+	
+	/**
 	 * exit on error
 	 * write errors to stderr
 	 * @param e
 	 */
 	private void handleError(ArtProcessorException e)
 	{
+		beforeExit();
 		System.err.println("ERROR IN: "+name);
 		e.printStackTrace();
 		System.exit(EXIT_FAILURE);

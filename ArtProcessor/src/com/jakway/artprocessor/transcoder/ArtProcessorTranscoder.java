@@ -31,8 +31,7 @@ public class ArtProcessorTranscoder
 	private File topLevelOutputDirectory = null;
 	private ArrayList<File> svgFiles = null;
 	
-	public ArtProcessorTranscoder(ArtProcessorErrorHandler errorHandler,
-			File topLevelOutputDirectory, ArrayList<File> svgFiles)
+	public ArtProcessorTranscoder(File topLevelOutputDirectory, ArrayList<File> svgFiles, ArtProcessorErrorHandler errorHandler)
 	{
 		this.errorHandler = errorHandler;
 		this.topLevelOutputDirectory = topLevelOutputDirectory;
