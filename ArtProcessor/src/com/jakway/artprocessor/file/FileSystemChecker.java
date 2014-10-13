@@ -8,7 +8,8 @@ import com.jakway.artprocessor.exception.ArtProcessorException;
 
 public class FileSystemChecker
 {
-	public static final String SVG_EXTENSION=".svg";
+	public static final String SVG_EXTENSION_WITH_PERIOD=".svg",
+			SVG_EXTENSION_NO_PERIOD="svg";
 	
 	private File inputDirectory=null;
 	private ArtProcessorErrorHandler errorHandler = null;
@@ -95,7 +96,7 @@ public class FileSystemChecker
 		//if it doesn't have an extension it can't have an SVG extension
 		if(extension == null)
 			return false;
-		else if(extension.equals(SVG_EXTENSION))
+		else if(extension.equals(SVG_EXTENSION_WITH_PERIOD) || extension.equals(SVG_EXTENSION_NO_PERIOD))
 			return true;
 		else
 			return false;

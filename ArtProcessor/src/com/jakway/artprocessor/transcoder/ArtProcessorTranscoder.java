@@ -18,6 +18,8 @@ import com.jakway.artprocessor.file.FileSystemChecker;
 
 public class ArtProcessorTranscoder
 {
+	private static final String JPEG_EXTENSION=".jpeg";
+	
 	private static final JPEGRasterOutputParams[] params = {
 		new JPEGRasterOutputParams("drawable-ldpi", new Float(0.75f), new Float(1.0f)),
 		new JPEGRasterOutputParams("drawable-mdpi", new Float(1.0f), new Float(1.0f)),
@@ -47,7 +49,7 @@ public class ArtProcessorTranscoder
 		
 		if(!topLevelOutputDirectory.exists())
 		{
-			errorHandler.fatalError(new ArtProcessorException("Top level art output directory does not exist."));
+			topLevelOutputDirectory.mkdir();
 		}
 		
 		//best way to check if we can write to the output directory is to try and write something
@@ -70,6 +72,8 @@ public class ArtProcessorTranscoder
 			
 			File outputDir = new File(topLevelOutputDirectory, thisParam.getOutputDirName());
 			
+			outputDir.mkdir();
+			
 			//write every SVG to every drawables directory
 			for(File thisSVGFile : svgFiles)
 			{
@@ -78,10 +82,12 @@ public class ArtProcessorTranscoder
 				}
 				catch(FileNotFoundException e)
 				{
+					e.printStackTrace();
 					errorHandler.error(new ArtProcessorException("Could not find input SVG file: "+thisSVGFile.toString()));
 				}
 				catch(TranscoderException e)
 				{
+					e.printStackTrace();
 					errorHandler.error(new ArtProcessorException("Transcoder problem while converting svg file: "+thisSVGFile.toString()+" in directory: "+outputDir.toString()));
 				}
 			}
@@ -93,7 +99,7 @@ public class ArtProcessorTranscoder
 		//generate the output filename and make sure it doesn't already exist
 		
 		//strip the extension from the input and add .svg
-		File outputFile = new File(outputDir, getFilenameNoExtension(inputSVG)+FileSystemChecker.SVG_EXTENSION);
+		File outputFile = new File(outputDir, getFilenameNoExtension(inputSVG)+JPEG_EXTENSION);
 		
 		if(outputFile.exists())
 		{
@@ -139,6 +145,6 @@ public class ArtProcessorTranscoder
 	 */
 	private static final String getFilenameNoExtension(File file)
 	{
-		return file.toString().replaceFirst("[.][^.]+$", "");
+		return file.getName().replaceFirst("[.][^.]+$", "");
 	}
 }
