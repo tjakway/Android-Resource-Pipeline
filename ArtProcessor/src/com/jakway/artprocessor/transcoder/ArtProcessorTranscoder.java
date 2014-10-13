@@ -96,6 +96,11 @@ public class ArtProcessorTranscoder
 					e.printStackTrace();
 					errorHandler.error(new ArtProcessorException("Could not find input SVG file: "+thisSVGFile.toString()));
 				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+					errorHandler.error(new ArtProcessorException("IO Error while writing SVG file: "+thisSVGFile.toString()));
+				}
 				catch(TranscoderException e)
 				{
 					e.printStackTrace();
@@ -122,15 +127,26 @@ public class ArtProcessorTranscoder
             ctx.setDynamicState(org.apache.batik.bridge.BridgeContext.DYNAMIC); 
             org.apache.batik.bridge.GVTBuilder builder = new org.apache.batik.bridge.GVTBuilder(); 
             svgIcon = builder.build(ctx, doc); 
+            
+            xmlParser=null;
+            df=null;
+            doc=null;
+            userAgent=null;
+            loader=null;
+            ctx=null;
+            builder=null;
         } catch (Exception excp) { 
             svgIcon = null; 
             excp.printStackTrace(); 
         }
         Rectangle2D rect = svgIcon.getPrimitiveBounds();
+        svgIcon=null;
+        
+        System.gc();
         return rect;
 	}
 	
-	private void convertAndWriteSVG(File inputSVG, File outputDir,  JPEGRasterOutputParams param) throws FileNotFoundException, TranscoderException
+	private void convertAndWriteSVG(File inputSVG, File outputDir,  JPEGRasterOutputParams param) throws TranscoderException, IOException
 	{
 		//generate the output filename and make sure it doesn't already exist
 		
@@ -149,9 +165,14 @@ public class ArtProcessorTranscoder
 	        JPEGTranscoder transcoder = new JPEGTranscoder();
 	        
 	        transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, param.getJpegQuality());
-	        //set the size multiplier
-	       // transcoder.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(param.getSizeMultiplier().floatValue() * ));
-	        try {getSVGDimensions(inputSVG); } catch(IOException e) {e.printStackTrace(); }
+	        
+	        //get SVG dimensions to use in the size multiplier
+	        Rectangle2D rect = getSVGDimensions(inputSVG);
+	        
+	        //set dimensions based on the size multiplier
+	        transcoder.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(param.getSizeMultiplier().floatValue() * rect.getWidth()));
+	        
+	        transcoder.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new Float(param.getSizeMultiplier().floatValue() * rect.getHeight()));
 	        
 	        inStream = new FileInputStream(inputSVG);
 	        
