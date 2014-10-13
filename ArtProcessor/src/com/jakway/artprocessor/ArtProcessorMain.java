@@ -54,15 +54,11 @@ public class ArtProcessorMain
 			}
 		}
 		
-		System.err.println("WARNING: SVG VALIDATION DISABLED");
-		//TODO: change to command line arguments
-		inputDir = new File("in");
 		if(!inputDir.exists())
 		{
-			System.err.println("input dir doesnt exist!");
+			System.err.println("input dir "+inputDir+"doesnt exist!");
 			System.exit(1);
 		}
-		outputDir = new File("out");
 		
 		FileSystemChecker checker = new FileSystemChecker(inputDir, new TerminatingArtProcessorErrorHandler("FileSystemChecker"));
 		
