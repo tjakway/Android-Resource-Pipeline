@@ -2,9 +2,11 @@ package com.jakway.artprocessor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.batik.transcoder.TranscoderException;
+import org.apache.commons.io.FileUtils;
 
 import com.jakway.artprocessor.errorhandler.TerminatingArtProcessorErrorHandler;
 import com.jakway.artprocessor.errorhandler.TranscoderErrorHandler;
@@ -50,7 +52,15 @@ public class ArtProcessorMain
 				System.out.println("--overwrite-on recognized.  Deleting output directory "+outputDir.toString());
 				//overwite on
 				//delete the output dir
-				outputDir.delete();
+				//outputDir.delete();
+				try {
+				FileUtils.deleteDirectory(outputDir);
+				}
+				catch(IOException e)
+				{
+					System.err.println("ERROR: Could not delete output directory!");
+					System.exit(EXIT_FAILURE);
+				}
 			}
 		}
 		
