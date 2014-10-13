@@ -1,5 +1,7 @@
 package com.jakway.artprocessor.transcoder;
 
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,14 +9,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.swing.svg.JSVGComponent;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
+import org.apache.batik.util.SVGConstants;
+import org.apache.batik.util.XMLResourceDescriptor;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.svg.SVGDocument;
 
 import com.jakway.artprocessor.errorhandler.ArtProcessorErrorHandler;
+import com.jakway.artprocessor.errorhandler.TranscoderErrorHandler;
 import com.jakway.artprocessor.exception.ArtProcessorException;
 import com.jakway.artprocessor.file.FileSystemChecker;
+import com.jakway.artprocessor.svg.SVGValidator;
 
 public class ArtProcessorTranscoder
 {
@@ -29,11 +40,11 @@ public class ArtProcessorTranscoder
 		//don't use drawable-xxxhdpi--it's for app icons only
 	};
 	
-	private ArtProcessorErrorHandler errorHandler = null;
+	private TranscoderErrorHandler errorHandler = null;
 	private File topLevelOutputDirectory = null;
 	private ArrayList<File> svgFiles = null;
 	
-	public ArtProcessorTranscoder(File topLevelOutputDirectory, ArrayList<File> svgFiles, ArtProcessorErrorHandler errorHandler)
+	public ArtProcessorTranscoder(File topLevelOutputDirectory, ArrayList<File> svgFiles, TranscoderErrorHandler errorHandler)
 	{
 		this.errorHandler = errorHandler;
 		this.topLevelOutputDirectory = topLevelOutputDirectory;
@@ -94,6 +105,22 @@ public class ArtProcessorTranscoder
 		}
 	}
 	
+	private void getSVGDimensions(File svgFile) throws IOException
+	{
+		
+	    String parser = XMLResourceDescriptor.getXMLParserClassName();
+	    SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
+	    factory.setErrorHandler(errorHandler);
+	    
+	    SVGDocument doc = factory.createSVGDocument(SVGValidator.convertToFileURL(svgFile));
+	    
+	    NamedNodeMap map = doc.getAttributes();
+	    Node heightNode = map.getNamedItem(SVGConstants.SVG_HEIGHT_ATTRIBUTE);
+	    String thisHeight = heightNode.getNodeValue();
+	    System.out.println("thisHeight: "+thisHeight);
+		
+	}
+	
 	private void convertAndWriteSVG(File inputSVG, File outputDir,  JPEGRasterOutputParams param) throws FileNotFoundException, TranscoderException
 	{
 		//generate the output filename and make sure it doesn't already exist
@@ -113,6 +140,9 @@ public class ArtProcessorTranscoder
 	        JPEGTranscoder transcoder = new JPEGTranscoder();
 	        
 	        transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, param.getJpegQuality());
+	        //set the size multiplier
+	       // transcoder.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(param.getSizeMultiplier().floatValue() * ));
+	        try {getSVGDimensions(inputSVG); } catch(IOException e) {e.printStackTrace(); }
 	        
 	        inStream = new FileInputStream(inputSVG);
 	        
