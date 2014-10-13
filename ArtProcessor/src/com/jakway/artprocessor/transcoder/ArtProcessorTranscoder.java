@@ -105,20 +105,29 @@ public class ArtProcessorTranscoder
 		}
 	}
 	
-	private void getSVGDimensions(File svgFile) throws IOException
+	/**
+	 * see http://batik.2283329.n4.nabble.com/General-difficulties-and-problems-getting-the-size-right-in-painting-an-SVG-document-containing-a-qu-td4100365.html
+	 */
+	private Rectangle2D getSVGDimensions(File svgFile) throws IOException
 	{
-		
-	    String parser = XMLResourceDescriptor.getXMLParserClassName();
-	    SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-	    factory.setErrorHandler(errorHandler);
-	    
-	    SVGDocument doc = factory.createSVGDocument(SVGValidator.convertToFileURL(svgFile));
-	    
-	    NamedNodeMap map = doc.getAttributes();
-	    Node heightNode = map.getNamedItem(SVGConstants.SVG_HEIGHT_ATTRIBUTE);
-	    String thisHeight = heightNode.getNodeValue();
-	    System.out.println("thisHeight: "+thisHeight);
-		
+		org.apache.batik.gvt.GraphicsNode svgIcon = null; 
+        try { 
+            String xmlParser = org.apache.batik.util.XMLResourceDescriptor.getXMLParserClassName(); 
+            org.apache.batik.dom.svg.SAXSVGDocumentFactory df = new org.apache.batik.dom.svg.SAXSVGDocumentFactory( 
+                xmlParser); 
+            org.w3c.dom.svg.SVGDocument doc = df.createSVGDocument(SVGValidator.convertToFileURL(svgFile)); 
+            org.apache.batik.bridge.UserAgent userAgent = new org.apache.batik.bridge.UserAgentAdapter(); 
+            org.apache.batik.bridge.DocumentLoader loader = new org.apache.batik.bridge.DocumentLoader(userAgent); 
+            org.apache.batik.bridge.BridgeContext ctx = new org.apache.batik.bridge.BridgeContext(userAgent, loader); 
+            ctx.setDynamicState(org.apache.batik.bridge.BridgeContext.DYNAMIC); 
+            org.apache.batik.bridge.GVTBuilder builder = new org.apache.batik.bridge.GVTBuilder(); 
+            svgIcon = builder.build(ctx, doc); 
+        } catch (Exception excp) { 
+            svgIcon = null; 
+            excp.printStackTrace(); 
+        }
+        Rectangle2D rect = svgIcon.getPrimitiveBounds();
+        return rect;
 	}
 	
 	private void convertAndWriteSVG(File inputSVG, File outputDir,  JPEGRasterOutputParams param) throws FileNotFoundException, TranscoderException
