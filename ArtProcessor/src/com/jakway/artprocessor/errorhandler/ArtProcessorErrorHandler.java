@@ -1,4 +1,4 @@
-package com.jakway.artprocessor;
+package com.jakway.artprocessor.errorhandler;
 
 import com.jakway.artprocessor.exception.ArtProcessorException;
 

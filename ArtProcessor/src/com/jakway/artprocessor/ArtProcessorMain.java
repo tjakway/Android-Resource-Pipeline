@@ -58,14 +58,6 @@ public class ArtProcessorMain implements org.apache.batik.transcoder.ErrorHandle
 		
 	}
 	
-	private static final void test() throws IOException
-	{
-	    String parser = XMLResourceDescriptor.getXMLParserClassName();
-	    SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
-	    String uri = "http://www.example.org/diagram.svg";
-	    Document doc = f.createDocument(uri);
-	}
-
 	@Override
 	public void error(TranscoderException e) throws TranscoderException
 	{
