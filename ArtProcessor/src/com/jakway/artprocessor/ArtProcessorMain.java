@@ -1,37 +1,58 @@
 package com.jakway.artprocessor;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.JPEGTranscoder;
-import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.Document;
 
-import com.jakway.artprocessor.errorhandler.ArtProcessorErrorHandler;
 import com.jakway.artprocessor.errorhandler.TerminatingArtProcessorErrorHandler;
 import com.jakway.artprocessor.errorhandler.TranscoderErrorHandler;
-import com.jakway.artprocessor.exception.ArtProcessorException;
 import com.jakway.artprocessor.file.FileSystemChecker;
-import com.jakway.artprocessor.svg.SVGValidator;
 import com.jakway.artprocessor.transcoder.ArtProcessorTranscoder;
 
 public class ArtProcessorMain
 {	
 	private static final String USAGE="Arguments:\n1. The input directory containing only SVG images and no subdirectories.\n2. The output directory to write bitmaps to." +
+			"optional arg: --overwrite=on to delete the output directory before writing." +
 			"WARNING: the passed output directory will be deleted if any errors are detected during export";
+	
+	private static final int MIN_ARGS=2, MAX_ARGS=3;
+	private static final String OVERWRITE_OPTION="--overwrite=on";
+	private static final int EXIT_FAILURE=1;
 	
 	public static void main(String args[]) throws TranscoderException, FileNotFoundException
 	{
 		File inputDir = null,
 				outputDir = null;
+		
+		if(args.length < MIN_ARGS || args.length > MAX_ARGS)
+		{
+			System.out.println(USAGE);
+			System.exit(EXIT_FAILURE);
+		}
+		
+		inputDir = new File(args[0]);
+		outputDir = new File(args[1]);
+		
+		//optional argument was passed
+		if(args.length == 3)
+		{
+			String optionalArg = args[2];
+			if(!optionalArg.equals(OVERWRITE_OPTION))
+			{
+				System.out.println("Didn't recognize 3rd optional argument.");
+				System.out.println(USAGE);
+				System.exit(EXIT_FAILURE);
+			}
+			else
+			{
+				System.out.println("--overwrite-on recognized.  Deleting output directory "+outputDir.toString());
+				//overwite on
+				//delete the output dir
+				outputDir.delete();
+			}
+		}
 		
 		System.err.println("WARNING: SVG VALIDATION DISABLED");
 		//TODO: change to command line arguments
@@ -47,6 +68,7 @@ public class ArtProcessorMain
 		
 		ArrayList<File> svgFiles = checker.checkFiles();
 		
+		//VALIDATOR NOT USED
 		//SVGValidator validator = new SVGValidator(svgFiles, new TerminatingArtProcessorErrorHandler("SVGValidator"));
 		//validator.validateSVGs();
 		
