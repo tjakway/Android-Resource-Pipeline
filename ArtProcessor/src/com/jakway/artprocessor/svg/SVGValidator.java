@@ -13,29 +13,17 @@ import com.jakway.artprocessor.exception.ArtProcessorException;
 
 public class SVGValidator implements org.xml.sax.ErrorHandler
 {
-	private File dtdPath = null;
 	private ArrayList<File> svgFiles=null;
 	private ArtProcessorErrorHandler errorHandler=null;
 	
-	public SVGValidator(ArtProcessorErrorHandler errorHandler, File dtdPath, ArrayList<File> svgFiles)
+	public SVGValidator(ArrayList<File> svgFiles, ArtProcessorErrorHandler errorHandler)
 	{
-		this.dtdPath = dtdPath;
 		this.svgFiles = svgFiles;
 		this.errorHandler = errorHandler;
 	}
 	
 	public void validateSVGs()
 	{
-		if(dtdPath == null)
-		{
-			errorHandler.error(new ArtProcessorException("SVG DTD path is null!"));
-		}
-		
-		if(!dtdPath.exists())
-		{
-			errorHandler.error(new ArtProcessorException("SVG DTD path doesn't exist!"));
-		}
-		
 		for(File svgFile : svgFiles)
 		{
 			validateThisSVG(svgFile);
