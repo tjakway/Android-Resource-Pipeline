@@ -6,7 +6,10 @@ import com.jakway.artprocessor.exception.AssetException;
 
 public class Main
 {
-	private static final String USAGE="";
+	private static final String USAGE="Arguments accepted:" +
+			"\n1. intput directory" +
+			"\n2. output directory" +
+			"\n3. optional 3rd argument: --overwrite=on will delete the output directory before writing to it.";
 	private static final int NUM_ARGS=2;
 	private static final int EXIT_FAILURE=1;
 	
