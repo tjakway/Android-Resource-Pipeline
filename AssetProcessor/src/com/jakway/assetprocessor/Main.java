@@ -3,6 +3,7 @@ package com.jakway.assetprocessor;
 import java.io.File;
 
 import com.jakway.artprocessor.exception.AssetException;
+import com.jakway.assetprocessor.util.ArgsUtils;
 
 public class Main
 {
@@ -10,7 +11,7 @@ public class Main
 			"\n1. intput directory" +
 			"\n2. output directory" +
 			"\n3. optional 3rd argument: --overwrite=on will delete the output directory before writing to it.";
-	private static final int NUM_ARGS=2;
+	private static final int MAX_NUM_ARGS=3, MIN_NUM_AGS=2;
 	private static final int EXIT_FAILURE=1;
 	
 	private static final void checkDir(File dir)
@@ -27,13 +28,15 @@ public class Main
 	
 	public static void main(String[] args)
 	{
-		if(args.length > NUM_ARGS)
+		if(args.length > MAX_NUM_ARGS || args.length < MIN_NUM_AGS)
 		{
 			System.out.println(USAGE);
 			System.exit(EXIT_FAILURE);
 		}
-		
+				
 		File in = new File(args[0]), out = new File(args[1]);
+		
+		ArgsUtils.checkOverwriteOption(args, out, USAGE);
 		
 		//perform basic checks--AssetFileOps will do more detailed checking
 		checkDir(in);
