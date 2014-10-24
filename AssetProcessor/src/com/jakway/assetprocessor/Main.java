@@ -32,9 +32,18 @@ public class Main
 		
 		File in = new File(args[0]), out = new File(args[1]);
 		
+		//perform basic checks--AssetFileOps will do more detailed checking
 		checkDir(in);
 		checkDir(out);
 		
-		
+		try {
+		AssetFileOps.copyDrawableFilesToAssets(in, out);
+		}
+		catch(Exception e)
+		{
+			System.err.println("ERROR DETECTED WHILE COPYING FILES.");
+			e.printStackTrace();
+			System.err.println("Copy aborted.  Existing files have been preserved (nothing was deleted)");
+		}
 	}
 }

@@ -1,11 +1,13 @@
 package com.jakway.assetprocessor;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 import com.jakway.artprocessor.exception.AssetException;
 
@@ -19,7 +21,7 @@ public class AssetFileOps
 		"ldpi", "mdpi", "hdpi", "xhdpi", "xxhdpi"
 	};
 	
-	public static final boolean isDrawableDir(File file)
+	private static final boolean isDrawableDir(File file)
 	{
 		return isDrawableDir(file.getName());
 	}
@@ -29,7 +31,7 @@ public class AssetFileOps
 	 * @param file
 	 * @return
 	 */
-	public static final boolean isDrawableDir(String file)
+	private static final boolean isDrawableDir(String file)
 	{
 		for(int i = 0; i < drawable_names.length; i++)
 		{
@@ -40,7 +42,7 @@ public class AssetFileOps
 		return false;
 	}
 	
-	public static final boolean containsDrawableFolders(List<File> files)
+	private static final boolean containsDrawableFolders(List<File> files)
 	{
 		for(File file : files)
 		{
@@ -51,11 +53,36 @@ public class AssetFileOps
 	}
 	
 	/**
+	 * writes all input files to their corresponding output paths
+	 * @param map of <InputFilepaths, OutputFilepaths>
+	 * @throws IOException 
+	 */
+	private static final void writeMappedOutput(Map<File, File> map) throws IOException
+	{
+		//iterate through the map with a for-each loop
+		for(Map.Entry<File, File> cursor : map.entrySet())
+		{
+			File inputFile = cursor.getKey(),
+					outputFile = cursor.getValue();
+			try {
+			//use Apache Commons IO to copy the file
+			FileUtils.copyFile(inputFile, outputFile);
+			}
+			//write an error message and throw the exception up
+			catch(IOException e)
+			{
+				System.err.println("Error while writing input file: "+inputFile.getName()+" to output file: "+outputFile.getName());
+				throw e;
+			}
+		}
+	}
+	
+	/**
 	 * returns the DPI prefix of file or null if file is not a drawable folder
 	 * @param file
 	 * @return
 	 */
-	public static final String getPrefix(File file)
+	private static final String getPrefix(File file)
 	{
 		if(!isDrawableDir(file))
 			return null;
@@ -77,7 +104,7 @@ public class AssetFileOps
 	 * @param outputDir
 	 * @return
 	 */
-	public static final Map<File, File> generateFileNames(File inputDir, File outputDir)
+	private static final Map<File, File> generateFileNames(File inputDir, File outputDir)
 	{
 		List<File> subDirs = Arrays.asList(inputDir.listFiles());
 		
@@ -103,7 +130,21 @@ public class AssetFileOps
 				//all output files are in a shallow asset directory
 				nameMap.put(file, new File(outputDir, copyName));
 			}
+			//warn for non-drawable folders
+			else
+			{
+				System.out.println("WARNING: "+file.toString()+" is not a drawable folder and will be ignored!");
+			}
 		}
 		return nameMap;
+	}
+	
+	public static final void copyDrawableFilesToAssets(File inputFolder, File outputFolder) throws IOException
+	{
+		//generateFileNames will also check that the inputFolder contains drawable folders
+		//also warns for non-drawable folders in the input directory
+		Map<File, File> map = generateFileNames(inputFolder, outputFolder);
+		
+		writeMappedOutput(map);
 	}
 }
