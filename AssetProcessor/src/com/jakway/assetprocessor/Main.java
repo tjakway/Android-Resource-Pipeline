@@ -18,7 +18,7 @@ public class Main
 	{
 		if(!dir.exists())
 		{
-			throw new AssetException("directory"+dir.getName()+" does not exist!");
+			throw new AssetException("directory "+dir.getName()+" does not exist!");
 		}
 		else if(!dir.isDirectory())
 		{
@@ -29,7 +29,7 @@ public class Main
 	public static void main(String[] args)
 	{
 		/*FIXME: DEBUG*/
-		args = new String[] { "art_in", "assets", "--overwrite=on" };
+		args = new String[] { "art_out", "assets", "--overwrite=on" };
 		/*FIXME: END DEBUG*/
 		
 		if(args.length > MAX_NUM_ARGS || args.length < MIN_NUM_AGS)

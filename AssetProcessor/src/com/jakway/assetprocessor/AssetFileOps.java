@@ -17,8 +17,9 @@ public class AssetFileOps
 		"drawable-ldpi", "drawable-mdpi", "drawable-hdpi", "drawable-xhdpi",
 		"drawable-xxhdpi"
 	};
+	private static final String HDPI_PREFIX="hdpi", XHDPI_PREFIX="xhdpi", XXHDPI_PREFIX="xxhdpi";
 	private static final String[] prefixes = { 
-		"ldpi", "mdpi", "hdpi", "xhdpi", "xxhdpi"
+		"ldpi", "mdpi", HDPI_PREFIX, XHDPI_PREFIX, XXHDPI_PREFIX
 	};
 	
 	private static final boolean isDrawableDir(File file)
@@ -90,7 +91,16 @@ public class AssetFileOps
 		String name = file.getName();
 		for(int i = 0; i < prefixes.length; i++)
 		{
-			if(name.equals(prefixes[i]))
+			//need to handle hdpi, xhdpi, and xxhdpi specially because endsWith("hdpi") is also true for xxhdpi and xhdpi
+			if(name.endsWith(HDPI_PREFIX) && !name.endsWith(XHDPI_PREFIX) && !name.endsWith(XXHDPI_PREFIX))
+				return HDPI_PREFIX;
+			else if(name.endsWith(XHDPI_PREFIX) && !name.endsWith(XXHDPI_PREFIX))
+				return XHDPI_PREFIX;
+			//ends with xxhdpi is also true for hdpi and xhdpi so have to return it before the general check all prefixes or the loop hits hdpi before xxhdpi and returns hdpi
+			else if(name.endsWith(XXHDPI_PREFIX))
+				return XXHDPI_PREFIX;
+			
+			if(name.endsWith(prefixes[i]))
 				return prefixes[i];
 		}
 		
@@ -120,20 +130,26 @@ public class AssetFileOps
 		
 		Map<File, File> nameMap = new HashMap<File, File>();
 		
-		for(File file : subDirs)
+		for(File dir : subDirs)
 		{
-			if(isDrawableDir(file))
+			if(isDrawableDir(dir))
 			{
-				String dpiPrefix = getPrefix(file);
-				String copyName = dpiPrefix + "_" + file.getName();
+				//the DPI prefix comes from the folder
+				String dpiPrefix = getPrefix(dir);
 				
-				//all output files are in a shallow asset directory
-				nameMap.put(file, new File(outputDir, copyName));
+				//go through every image inside this drawable folder
+				for(File imgFile : Arrays.asList(dir.listFiles()))
+				{
+					String copyName = dpiPrefix + "_" + imgFile.getName();
+					
+					//all output files are in a shallow asset directory
+					nameMap.put(imgFile, new File(outputDir, copyName));
+				}
 			}
 			//warn for non-drawable folders
 			else
 			{
-				System.out.println("WARNING: "+file.toString()+" is not a drawable folder and will be ignored!");
+				System.out.println("WARNING: "+dir.toString()+" is not a drawable folder and will be ignored!");
 			}
 		}
 		return nameMap;
