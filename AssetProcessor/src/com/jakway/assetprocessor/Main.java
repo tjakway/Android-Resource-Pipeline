@@ -28,6 +28,10 @@ public class Main
 	
 	public static void main(String[] args)
 	{
+		/*FIXME: DEBUG*/
+		args = new String[] { "art_in", "assets", "--overwrite=on" };
+		/*FIXME: END DEBUG*/
+		
 		if(args.length > MAX_NUM_ARGS || args.length < MIN_NUM_AGS)
 		{
 			System.out.println(USAGE);
@@ -40,7 +44,19 @@ public class Main
 		
 		//perform basic checks--AssetFileOps will do more detailed checking
 		checkDir(in);
-		checkDir(out);
+		
+		//don't check out because it doesn't exist yet
+		if(!out.exists())
+		{
+			System.out.println("output directory "+out.toString()+" does not exist yet.  Attempting to create...");
+			boolean success = out.mkdir();
+			if(!success)
+			{
+				System.err.println("Could not create output directory "+out.toString()+"!");
+				System.err.println("Exiting...");
+				System.exit(EXIT_FAILURE);
+			}
+		}
 		
 		try {
 		AssetFileOps.copyDrawableFilesToAssets(in, out);

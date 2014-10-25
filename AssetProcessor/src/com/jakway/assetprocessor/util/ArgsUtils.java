@@ -36,8 +36,12 @@ public class ArgsUtils
 				//delete the output dir
 				//outputDir.delete();
 				try {
-					//use Apache IO Commons to delete the folder
-					FileUtils.deleteDirectory(folderToDelete);
+					//delete the folder if it exists
+					if(folderToDelete.exists())
+					{
+						//use Apache IO Commons to delete the folder
+						FileUtils.deleteDirectory(folderToDelete);
+					}
 				}
 				catch(IOException e)
 				{
