@@ -28,10 +28,6 @@ public class Main
 	
 	public static void main(String[] args)
 	{
-		/*FIXME: DEBUG*/
-		args = new String[] { "art_out", "assets", "--overwrite=on" };
-		/*FIXME: END DEBUG*/
-		
 		if(args.length > MAX_NUM_ARGS || args.length < MIN_NUM_AGS)
 		{
 			System.out.println(USAGE);
