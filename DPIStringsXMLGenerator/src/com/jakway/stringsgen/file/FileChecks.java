@@ -2,6 +2,7 @@ package com.jakway.stringsgen.file;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
@@ -39,23 +40,40 @@ public class FileChecks
 			throw new DPIStringsGeneratorException("Input folder "+dir.toString()+" does not contain any drawable folders!");
 		}
 		
-		
-		
-		org.apache.commons.io.FileUtils.listFiles(dir, ioFilter, ioFilter);
+		//get all files that shouldn't be there
+		Collection<File> badFiles = org.apache.commons.io.FileUtils.listFiles(dir, ioFilter, ioFilter);
+		for(File file : badFiles)
+		{
+			System.err.println("WARNING: found misplaced file "+file.toString()+" in the input folder.  It will be ignored.");
+		}
 		
 	}
 	
+	/**
+	 * returns a list of files that shouldn't be there:
+	 * -files that aren't in image_extensions
+	 * -directories that aren't drawable folders
+	 */
 	private static final IOFileFilter ioFilter = new IOFileFilter()
 	{
-		
+		/**
+		 * checks for improper files
+		 * @param file
+		 * @param name
+		 * @return false for OK files, true for ones that shouldn't be there
+		 */
 		private boolean doCheck(File file, String name)
 		{
+			//exclude if it begins with a period (hidden file)
+			if(file.getName().startsWith(".") || name.startsWith("."))
+				return false;
+			
 			//if it's a directory, make sure it's a drawable directory
 			if(file.isDirectory()) {
 				for(int i = 0; i < drawable_names.length; i++)
 				{
 					if(file.getName().equals(drawable_names[i]))
-						return true;
+						return false;
 				}
 				return false;
 			}
@@ -63,9 +81,9 @@ public class FileChecks
 			else
 			{
 				if(FilenameUtils.isExtension(name, image_extensions))
-					return true;
-				else
 					return false;
+				else
+					return true;
 			}
 		}
 		
