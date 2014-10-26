@@ -7,17 +7,30 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
 
 import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
 
 public class FileChecks
 {
+	/**
+	 * MUST BE IN THE SAME ORDER AS drawable_names
+	 */
+	public static final String[] values_names = {
+		"values-ldpi", "values-mdpi", "values-hdpi", "values-xhdpi", "values-xxhdpi"
+	};
+	
+	/**
+	 * MUST BE IN THE SAME ORDER AS values_names
+	 */
 	public static final String[] drawable_names = {
 		"drawable-ldpi", "drawable-mdpi", "drawable-hdpi", "drawable-xhdpi",
 		"drawable-xxhdpi"
+	};
+	
+	public static final String HDPI_PREFIX="hdpi", XHDPI_PREFIX="xhdpi", XXHDPI_PREFIX="xxhdpi";
+	public static final String[] prefixes = { 
+		"ldpi", "mdpi", HDPI_PREFIX, XHDPI_PREFIX, XXHDPI_PREFIX
 	};
 	
 	public static final String[] image_extensions = 
@@ -112,5 +125,25 @@ public class FileChecks
 				System.out.println("WARNING: output directory "+dir.toString()+" contains hidden files.");
 			return true;
 		}
+	}
+	
+	/**
+	 * gets all non hidden files and tests if any of them are directories
+	 * @param dir
+	 * @return
+	 */
+	public static final boolean hasSubDirs(File dir)
+	{
+		if(!dir.isDirectory())
+			throw new DPIStringsGeneratorException("Passed file is not a directory!");
+		
+		Collection<File> files = FileUtils.listFilesAndDirs(dir, HiddenFileFilter.VISIBLE, HiddenFileFilter.VISIBLE);
+		
+		for(File file : files)
+		{
+			if(file.isDirectory())
+				return true;
+		}
+		return false;
 	}
 }

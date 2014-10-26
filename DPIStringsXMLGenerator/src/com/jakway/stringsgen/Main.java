@@ -3,6 +3,7 @@ package com.jakway.stringsgen;
 import java.io.File;
 import java.io.IOException;
 
+import com.jakway.stringsgen.file.ArgsUtils;
 import com.jakway.stringsgen.file.FileChecks;
 
 public class Main
@@ -13,6 +14,7 @@ public class Main
 	
 	public static void main(String[] args)
 	{
+		//file and input checks
 		if(args.length > MAX_ARGS || args.length < MIN_ARGS)
 		{
 			System.err.println(USAGE);
@@ -36,9 +38,8 @@ public class Main
 		}
 		
 		if(!empty)
-		{
-			System.out.println("Output directory is not empty.");
-		}
+			ArgsUtils.checkOverwriteOption(args, out_drawables_folder, USAGE);
+		
 		
 	}
 }
