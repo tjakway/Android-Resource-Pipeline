@@ -1,23 +1,26 @@
 package com.jakway.stringsgen.file;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 
 import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
 
 public class FileChecks
 {
-	private static final String[] drawable_names = {
+	public static final String[] drawable_names = {
 		"drawable-ldpi", "drawable-mdpi", "drawable-hdpi", "drawable-xhdpi",
 		"drawable-xxhdpi"
 	};
 	
-	private static final String[] image_extensions = 
+	public static final String[] image_extensions = 
 		{
 		"gif", "jpg", "png", 
 		"jpeg" /*less common, but still allowed*/
@@ -41,7 +44,7 @@ public class FileChecks
 		}
 		
 		//get all files that shouldn't be there
-		Collection<File> badFiles = org.apache.commons.io.FileUtils.listFiles(dir, ioFilter, ioFilter);
+		Collection<File> badFiles = org.apache.commons.io.FileUtils.listFiles(dir, new NotImageIOChecker(), new NotImageIOChecker());
 		for(File file : badFiles)
 		{
 			System.err.println("WARNING: found misplaced file "+file.toString()+" in the input folder.  It will be ignored.");
@@ -49,58 +52,7 @@ public class FileChecks
 		
 	}
 	
-	/**
-	 * returns a list of files that shouldn't be there:
-	 * -files that aren't in image_extensions
-	 * -directories that aren't drawable folders
-	 */
-	private static final IOFileFilter ioFilter = new IOFileFilter()
-	{
-		/**
-		 * checks for improper files
-		 * @param file
-		 * @param name
-		 * @return false for OK files, true for ones that shouldn't be there
-		 */
-		private boolean doCheck(File file, String name)
-		{
-			//exclude if it begins with a period (hidden file)
-			if(file.getName().startsWith(".") || name.startsWith("."))
-				return false;
-			
-			//if it's a directory, make sure it's a drawable directory
-			if(file.isDirectory()) {
-				for(int i = 0; i < drawable_names.length; i++)
-				{
-					if(file.getName().equals(drawable_names[i]))
-						return false;
-				}
-				return false;
-			}
-			//accept all non-SVG image files (any file with an extesnion in image_extensions)
-			else
-			{
-				if(FilenameUtils.isExtension(name, image_extensions))
-					return false;
-				else
-					return true;
-			}
-		}
 		
-		
-		@Override
-		public boolean accept(File file)
-		{
-			return doCheck(file, file.getName());
-		}
-
-		@Override
-		public boolean accept(File dir, String name)
-		{
-			return doCheck(dir, name);
-		}
-				
-		};
 	
 	
 	private static final boolean containsDrawableFolders(List<File> files)
@@ -132,5 +84,33 @@ public class FileChecks
 	private static final boolean isDrawableDir(File file)
 	{
 		return isDrawableDir(file.getName());
+	}
+	
+	/**
+	 * you should check if the passed file is a directory before calling this method
+	 * warns if the directory contains hidden files but still returns true if it's empty except for hidden files
+	 * USES APACHE IO COMMONS
+	 * @param file
+	 * @return
+	 */
+	public static final boolean dirIsEmptyWarnHidden(File dir) throws IOException
+	{
+		if(!dir.isDirectory())
+			throw new IOException(dir.toString()+" is not a directory--can't check if it's empty!");
+		
+		//check for visible files first because if they exist it rules out the directory regardless of hidden files
+		Collection<File> visibleFiles = FileUtils.listFiles(dir, HiddenFileFilter.VISIBLE, HiddenFileFilter.VISIBLE);
+		
+		if(visibleFiles.size() > 0)
+			return false;
+		else
+		{
+			//check for hidden files
+			Collection<File> hiddenFiles = FileUtils.listFiles(dir, HiddenFileFilter.HIDDEN, HiddenFileFilter.HIDDEN);
+			
+			if(hiddenFiles.size() > 0)
+				System.out.println("WARNING: output directory "+dir.toString()+" contains hidden files.");
+			return true;
+		}
 	}
 }
