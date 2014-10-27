@@ -20,14 +20,6 @@ public class FileChecks
 		"values-ldpi", "values-mdpi", "values-hdpi", "values-xhdpi", "values-xxhdpi"
 	};
 	
-	/**
-	 * MUST BE IN THE SAME ORDER AS values_names
-	 */
-	public static final String[] drawable_names = {
-		"drawable-ldpi", "drawable-mdpi", "drawable-hdpi", "drawable-xhdpi",
-		"drawable-xxhdpi"
-	};
-	
 	public static final String HDPI_PREFIX="hdpi", XHDPI_PREFIX="xhdpi", XXHDPI_PREFIX="xxhdpi";
 	public static final String[] prefixes = { 
 		"ldpi", "mdpi", HDPI_PREFIX, XHDPI_PREFIX, XXHDPI_PREFIX
@@ -51,52 +43,13 @@ public class FileChecks
 			throw new DPIStringsGeneratorException("Input folder "+dir.toString()+" is not a directory!");
 		}
 		
-		if(!containsDrawableFolders(Arrays.asList(dir.listFiles())))
-		{
-			throw new DPIStringsGeneratorException("Input folder "+dir.toString()+" does not contain any drawable folders!");
-		}
-		
 		//get all files that shouldn't be there
-		Collection<File> badFiles = org.apache.commons.io.FileUtils.listFiles(dir, new NotImageIOChecker(), new NotImageIOChecker());
+		Collection<File> badFiles = org.apache.commons.io.FileUtils.listFiles(dir, new NotImageIOChecker(), null);
 		for(File file : badFiles)
 		{
 			System.err.println("WARNING: found misplaced file "+file.toString()+" in the input folder.  It will be ignored.");
 		}
 		
-	}
-	
-		
-	
-	
-	private static final boolean containsDrawableFolders(List<File> files)
-	{
-		for(File file : files)
-		{
-			if(isDrawableDir(file))
-				return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * simply checks if file matches a predefined list of drawable folder names
-	 * @param file
-	 * @return
-	 */
-	private static final boolean isDrawableDir(String file)
-	{
-		for(int i = 0; i < drawable_names.length; i++)
-		{
-			if(file.equals(drawable_names[i]))
-				return true;
-		}
-		
-		return false;
-	}
-	
-	private static final boolean isDrawableDir(File file)
-	{
-		return isDrawableDir(file.getName());
 	}
 	
 	/**

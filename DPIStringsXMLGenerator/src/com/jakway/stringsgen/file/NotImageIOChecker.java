@@ -24,16 +24,11 @@ public class NotImageIOChecker implements IOFileFilter
 		if(file.getName().startsWith(".") || name.startsWith("."))
 			return false;
 		
-		//if it's a directory, make sure it's a drawable directory
+		//there shouldn't be any directories
 		if(file.isDirectory()) {
-			for(int i = 0; i < FileChecks.drawable_names.length; i++)
-			{
-				if(file.getName().equals(FileChecks.drawable_names[i]))
-					return false;
-			}
 			return false;
 		}
-		//accept all non-SVG image files (any file with an extesnion in image_extensions)
+		//accept all non-SVG image files (any file with an extension in image_extensions)
 		else
 		{
 			if(FilenameUtils.isExtension(name, FileChecks.image_extensions))

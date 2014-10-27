@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.HiddenFileFilter;
 
 import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
 import com.jakway.stringsgen.file.FileChecks;
@@ -15,10 +16,6 @@ import com.jakway.stringsgen.misc.Pair;
 public class StringsGenMapper
 {
 	/**
-	 * maps values folder name : drawable-dpi folder name
-	 */
-	private Map<String, String> valuesToDrawable = new HashMap<String, String>();
-	/**
 	 * maps values folder name : <string XML key, string XML value> AKA
 	 * values folder name : <filename, dpi_specific_filename>
 	 */
@@ -26,60 +23,42 @@ public class StringsGenMapper
 	
 	public StringsGenMapper(File in, File out)
 	{
-		//set up the valuesToDrawable map
-		//put each values-xdpi corresponding to the opposite drawable-xdpi
-		for(int i = 0; i < FileChecks.values_names.length; i++)
+		if(FileChecks.hasSubDirs(in))
 		{
-			valuesToDrawable.put(FileChecks.values_names[0], FileChecks.drawable_names[0]);
+			System.out.println("WARNING: the input folder "+in.toString()+"  has subdirectories--this tool does not support recursive traversal at this time.");
+		}
+			
+		//don't traverse subdirectories
+		Collection<File> assetFiles = FileUtils.listFiles(in, HiddenFileFilter.VISIBLE, null);
+		
+		for(File imageFile : assetFiles)
+		{
+			String name = imageFile.getName();
+			
+			//get the prefix
+			String prefix = null;
+			//need to handle hdpi, xhdpi, and xxhdpi specially because endsWith("hdpi") is also true for xxhdpi and xhdpi
+			if(name.startsWith(FileChecks.HDPI_PREFIX) && !name.startsWith(FileChecks.XHDPI_PREFIX) && !name.startsWith(FileChecks.XXHDPI_PREFIX))
+				prefix = FileChecks.HDPI_PREFIX;
+			else if(name.startsWith(FileChecks.XHDPI_PREFIX) && !name.startsWith(FileChecks.XXHDPI_PREFIX))
+				prefix = FileChecks.XHDPI_PREFIX;
+			//ends with xxhdpi is also true for hdpi and xhdpi so have to return it before the general check all prefixes or the loop hits hdpi before xxhdpi and returns hdpi
+			else if(name.startsWith(FileChecks.XXHDPI_PREFIX))
+				prefix = FileChecks.XXHDPI_PREFIX;
+			
+			for(int i = 0; i < FileChecks.prefixes.length; i++)
+			{
+			if(name.startsWith(FileChecks.prefixes[i]))
+				prefix = FileChecks.prefixes[i];
+			}
+			
+			final int prefixIndex = new String(prefix + "_").length();
+			Pair<String, String> pair = new Pair<String, String>(name, name.substring(prefixIndex));
+			valuesToPair.put(prefix, pair);
 		}
 		
-		//set up the valuesToPair map
-		//iterate through every drawable folder in the map
-		for(Map.Entry<String, String> cursor : valuesToDrawable.entrySet())
-		{
-			//the folder will be a subdirectory of the main input folder
-			File drawableFolder = new File (in, cursor.getValue());
-			//skip any nonexistant folders
-			if(!drawableFolder.exists())
-				continue;
-			if(!drawableFolder.isDirectory())
-			{
-				throw new DPIStringsGeneratorException(drawableFolder.toString()+" is not a directory, expected a drawable folder!");
-			}
-			
-			//exclude subdirectories from the search
-			if(FileChecks.hasSubDirs(drawableFolder))
-			{
-				System.out.println("WARNING: the drawable folder "+drawableFolder.toString()+"  has subdirectories!  The Android build system does NOT allow drawable subdirectories and these will be ignored by this tool.");
-			}
-			
-			//the files for this drawable folder
-			Collection<File> files = FileUtils.listFiles(drawableFolder, FileFileFilter.FILE, null);
-			//process each file and add it to the map
-			for(File file : files)
-			{
-				String name = file.getName();
-				//check each name against all prefixes
-				for(int i = 0; i < FileChecks.prefixes.length; i++)
-				{
-					if(name.startsWith(FileChecks.prefixes[i]))
-					{
-						//this would normally be prefixes[i].length() - 1 but we also want to truncate the underscore after the DPI prefix
-						String noPrefix = name.substring(FileChecks.prefixes[i].length());
-						//cursor.getKey() is the values folder associated with this drawable folder
-						valuesToPair.put(cursor.getKey(), new Pair<String, String>(name, noPrefix));
-					}
-				}
-			}
-			
-		}
 	}
-
-	public Map<String, String> getValuesToDrawable()
-	{
-		return valuesToDrawable;
-	}
-
+	
 	public Map<String, Pair<String, String>> getValuesToPair()
 	{
 		return valuesToPair;
