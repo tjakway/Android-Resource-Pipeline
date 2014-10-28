@@ -1,15 +1,14 @@
 package com.jakway.stringsgen.map;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 
-import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
 import com.jakway.stringsgen.file.FileChecks;
 import com.jakway.stringsgen.misc.Pair;
 
@@ -18,14 +17,21 @@ public class StringsGenMapper
 	/**
 	 * maps values folder name : <string XML key, string XML value> AKA
 	 * values folder name : <filename, dpi_specific_filename>
+	 * used to model a one to many relationship between prefixes and filenames
 	 */
-	private Map<String, Pair<String, String>> valuesToPair = new HashMap<String, Pair<String, String>>();
+	private Map<String, ArrayList<Pair<String, String>>> valuesToPair = new HashMap<String, ArrayList<Pair<String, String>>>();
 	
 	public StringsGenMapper(File in, File out)
 	{
 		if(FileChecks.hasSubDirs(in))
 		{
 			System.out.println("WARNING: the input folder "+in.toString()+"  has subdirectories--this tool does not support recursive traversal at this time.");
+		}
+		
+		//initialize the map with empty arraylists
+		for(int i = 0; i < FileChecks.prefixes.length; i++)
+		{
+			valuesToPair.put(FileChecks.prefixes[i], new ArrayList<Pair<String, String>>());
 		}
 			
 		//don't traverse subdirectories
@@ -54,12 +60,16 @@ public class StringsGenMapper
 			
 			final int prefixIndex = new String(prefix + "_").length();
 			Pair<String, String> pair = new Pair<String, String>(name, name.substring(prefixIndex));
-			valuesToPair.put(prefix, pair);
+			
+			//get the arraylist, add to it, and put it back
+			ArrayList<Pair<String, String>> prefixList = valuesToPair.get(prefix);
+			prefixList.add(pair);
+			valuesToPair.put(prefix, prefixList);
 		}
 		
 	}
 	
-	public Map<String, Pair<String, String>> getValuesToPair()
+	public Map<String, ArrayList<Pair<String, String>>> getValuesToPair()
 	{
 		return valuesToPair;
 	}

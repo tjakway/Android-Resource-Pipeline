@@ -2,6 +2,7 @@ package com.jakway.stringsgen;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.jakway.stringsgen.file.ArgsUtils;
@@ -54,7 +55,18 @@ public class Main
 			ArgsUtils.checkOverwriteOption(args, out_values_folder, USAGE);
 		
 		StringsGenMapper mapper = new StringsGenMapper(in_drawables_folder, out_values_folder);
-		Map<String, Pair<String, String>> pairMap = mapper.getValuesToPair();
+		Map<String, ArrayList<Pair<String, String>>> pairMap = mapper.getValuesToPair();
+		
+		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : pairMap.entrySet())
+		{
+			System.out.println("Map key: "+entry.getKey());
+			
+			ArrayList<Pair<String, String>> list = entry.getValue();
+			for(Pair<String, String> pair : list)
+			{
+				System.out.println("pair left: "+pair.getLeft()+", pair right: "+pair.getRight());
+			}
+		}
 		
 		System.out.println();
 	}
