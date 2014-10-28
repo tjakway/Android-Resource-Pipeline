@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.jakway.stringsgen.file.ArgsUtils;
 import com.jakway.stringsgen.file.FileChecks;
-import com.jakway.stringsgen.map.StringsGenMapper;
+import com.jakway.stringsgen.map.Mapper;
 import com.jakway.stringsgen.misc.Pair;
 
 public class Main
@@ -54,7 +54,7 @@ public class Main
 		if(!empty)
 			ArgsUtils.checkOverwriteOption(args, out_values_folder, USAGE);
 		
-		StringsGenMapper mapper = new StringsGenMapper(in_drawables_folder, out_values_folder);
+		Mapper mapper = new Mapper(in_drawables_folder, out_values_folder);
 		Map<String, ArrayList<Pair<String, String>>> pairMap = mapper.getValuesToPair();
 		
 		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : pairMap.entrySet())

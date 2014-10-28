@@ -12,7 +12,7 @@ import org.apache.commons.io.filefilter.HiddenFileFilter;
 import com.jakway.stringsgen.file.FileChecks;
 import com.jakway.stringsgen.misc.Pair;
 
-public class StringsGenMapper
+public class Mapper
 {
 	/**
 	 * maps values folder name : <string XML key, string XML value> AKA
@@ -21,7 +21,7 @@ public class StringsGenMapper
 	 */
 	private Map<String, ArrayList<Pair<String, String>>> valuesToPair = new HashMap<String, ArrayList<Pair<String, String>>>();
 	
-	public StringsGenMapper(File in, File out)
+	public Mapper(File in, File out)
 	{
 		if(FileChecks.hasSubDirs(in))
 		{
@@ -66,7 +66,6 @@ public class StringsGenMapper
 			prefixList.add(pair);
 			valuesToPair.put(prefix, prefixList);
 		}
-		
 	}
 	
 	public Map<String, ArrayList<Pair<String, String>>> getValuesToPair()
