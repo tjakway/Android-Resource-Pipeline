@@ -10,6 +10,7 @@ import com.jakway.stringsgen.file.FileChecks;
 import com.jakway.stringsgen.map.MapWriter;
 import com.jakway.stringsgen.map.Mapper;
 import com.jakway.stringsgen.misc.Pair;
+import com.jakway.stringsgen.postprocessor.XMLPostProcessor;
 
 public class Main
 {
@@ -18,11 +19,7 @@ public class Main
 	private static final int EXIT_FAILURE=1;
 	
 	public static void main(String[] args)
-	{
-		//FIXME: DEBUG
-		args = new String[] {"assets", "values_out", "--overwrite=on" };
-		//FIXME: END DEBUG
-		
+	{	
 		//file and input checks
 		if(args.length > MAX_ARGS || args.length < MIN_ARGS)
 		{
@@ -55,22 +52,24 @@ public class Main
 		if(!empty)
 			ArgsUtils.checkOverwriteOption(args, out_values_parent_folder, USAGE);
 		
+		//map the assets to output data
 		Mapper mapper = new Mapper(in_drawables_folder, out_values_parent_folder);
 		Map<String, ArrayList<Pair<String, String>>> pairMap = mapper.getValuesToPair();
 		
-		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : pairMap.entrySet())
-		{
-			System.out.println("Map key: "+entry.getKey());
-			
-			ArrayList<Pair<String, String>> list = entry.getValue();
-			for(Pair<String, String> pair : list)
-			{
-				System.out.println("pair left: "+pair.getLeft()+", pair right: "+pair.getRight());
-			}
+		//transform the assets:output data map to XML and write it
+		MapWriter writer = new MapWriter(out_values_parent_folder);
+		writer.write(pairMap);
+		
+		//perform postprocessing on the XML files
+		ArrayList<File> writtenXMLFiles = writer.getWrittenFiles();
+		try {
+		XMLPostProcessor.removeStandaloneAttributes(writtenXMLFiles);
 		}
-		
-		new MapWriter(out_values_parent_folder).write(pairMap);
-		
-		System.out.println();
+		catch(IOException e)
+		{
+			System.err.println("Fatal IO exception during XML postprocessing (remove standalone=no/yes attribute)");
+			e.printStackTrace();
+			System.exit(EXIT_FAILURE);
+		}
 	}
 }
