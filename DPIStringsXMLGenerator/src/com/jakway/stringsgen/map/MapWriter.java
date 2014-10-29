@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
 import com.jakway.stringsgen.misc.Pair;
 
 public class MapWriter
@@ -18,6 +19,7 @@ public class MapWriter
 	private static final String ROOT_ELEMENT_NAME="resources",
 			STRING_ELEMENT_NAME="string",
 			NAME_ATTRIBUTE="name";
+	private static final String STRINGS_FILENAME="strings.xml";
 			
 	
 	private File in=null,
@@ -29,7 +31,7 @@ public class MapWriter
 		this.out = out;
 	}
 	
-	private Document getXMLDOMTree(File valuesDir, ArrayList<Pair<String, String>> elements) throws ParserConfigurationException
+	private Document getXMLDOMTree(ArrayList<Pair<String, String>> elements) throws ParserConfigurationException
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
@@ -58,19 +60,55 @@ public class MapWriter
 		return doc;
 	}
 	
+	private String getValuesFilenameFromDPIPrefix(String prefix)
+	{
+		return "values-"+prefix;
+	}
+	
 	public void write(Map<String, ArrayList<Pair<String, String>>> map)
-	{		
+	{
+		
 		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : map.entrySet())
 		{
-			System.out.println("Map key: "+entry.getKey());
-			
+			try {			
 			ArrayList<Pair<String, String>> list = entry.getValue();
-			for(Pair<String, String> pair : list)
+			
+			Document dom = getXMLDOMTree(entry.getValue());
+			
+			//get the filename corresponding to the key
+			String valuesFilename = getValuesFilenameFromDPIPrefix(entry.getKey());
+			
+			//get the values folder
+			File valuesFolder = new File(out, valuesFilename);
+			
+			File stringsFile = new File(valuesFolder, valuesFilename);
+			
+			//make the directory
+			if(!valuesFolder.exists())
 			{
-				//get the XML tree
-				
-				System.out.println("pair left: "+pair.getLeft()+", pair right: "+pair.getRight());
+				boolean success = valuesFolder.mkdir();
+				if(!success)
+					throw new DPIStringsGeneratorException("Could not create directory "+valuesFolder.toString()+"!");
+			}
+			else if(valuesFolder.exists() && !valuesFolder.isDirectory())
+			{
+				throw new DPIStringsGeneratorException(valuesFolder.toString()+" exists but is not a directory!");
+			}
+			
+			//write the strings.xml file
+			
+			
+			}
+			catch(ParserConfigurationException e)
+			{
+				e.printStackTrace();
+				throw new DPIStringsGeneratorException("ParserConfigurationException thrown while writing ArrayList to file corresponding to Map key: "+entry.getKey());
 			}
 		}
+	}
+	
+	private void writeDOMToFile(File stringsXMLFile, Document DOM)
+	{
+		
 	}
 }
