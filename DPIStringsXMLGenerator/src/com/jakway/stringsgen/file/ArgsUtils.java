@@ -41,6 +41,10 @@ public class ArgsUtils
 					{
 						//use Apache IO Commons to delete the folder
 						FileUtils.deleteDirectory(folderToDelete);
+						
+						//don't forget to re-create the directory after!
+						if(!folderToDelete.mkdir())
+							throw new IOException("Failed to recreate directory "+folderToDelete.toString()+" after deleting it!");
 					}
 				}
 				catch(IOException e)

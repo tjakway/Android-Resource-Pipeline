@@ -7,12 +7,13 @@ import java.util.Map;
 
 import com.jakway.stringsgen.file.ArgsUtils;
 import com.jakway.stringsgen.file.FileChecks;
+import com.jakway.stringsgen.map.MapWriter;
 import com.jakway.stringsgen.map.Mapper;
 import com.jakway.stringsgen.misc.Pair;
 
 public class Main
 {
-	private static final String USAGE="USAGE_STR";
+	private static final String USAGE="This is the DPI Strings XML Generator.  Call with the following arguments:\n1. the input folder--should be the 'assets' folder.\n2. the output folder.  values-xxxx (e.g. values-ldpi, values-mdpi...) subfolders will be created in this folder.\n3. optional --overwrite=on option to delete the output folder if it already exists before writing to it.";
 	private static final int MIN_ARGS=2, MAX_ARGS=3;
 	private static final int EXIT_FAILURE=1;
 	
@@ -30,18 +31,18 @@ public class Main
 		}
 		
 		File in_drawables_folder = new File(args[0]),
-				out_values_folder = new File(args[1]);
+				out_values_parent_folder = new File(args[1]);
 		
 		FileChecks.checkDrawableInputFolder(in_drawables_folder);
 		
 		boolean empty = false;
 		try {
-			if(out_values_folder.exists())
-				empty = FileChecks.dirIsEmptyWarnHidden(out_values_folder);
+			if(out_values_parent_folder.exists())
+				empty = FileChecks.dirIsEmptyWarnHidden(out_values_parent_folder);
 			else
 			{
-				if(!out_values_folder.mkdir())
-					throw new IOException("Failed to create dir: "+out_values_folder.toString());
+				if(!out_values_parent_folder.mkdir())
+					throw new IOException("Failed to create dir: "+out_values_parent_folder.toString());
 			}
 		}
 		catch(IOException e)
@@ -52,9 +53,9 @@ public class Main
 		}
 		
 		if(!empty)
-			ArgsUtils.checkOverwriteOption(args, out_values_folder, USAGE);
+			ArgsUtils.checkOverwriteOption(args, out_values_parent_folder, USAGE);
 		
-		Mapper mapper = new Mapper(in_drawables_folder, out_values_folder);
+		Mapper mapper = new Mapper(in_drawables_folder, out_values_parent_folder);
 		Map<String, ArrayList<Pair<String, String>>> pairMap = mapper.getValuesToPair();
 		
 		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : pairMap.entrySet())
@@ -67,6 +68,8 @@ public class Main
 				System.out.println("pair left: "+pair.getLeft()+", pair right: "+pair.getRight());
 			}
 		}
+		
+		new MapWriter(out_values_parent_folder).write(pairMap);
 		
 		System.out.println();
 	}
