@@ -18,6 +18,7 @@ public class Mapper
 	 * maps values folder name : <string XML key, string XML value> AKA
 	 * values folder name : <filename, dpi_specific_filename>
 	 * used to model a one to many relationship between prefixes and filenames
+	 * Pair<String, String> is <FilenameWITHOUTDPI, FilenameWITHDPI> because the "without DPI" string is used as the string key to get the DPI string
 	 */
 	private Map<String, ArrayList<Pair<String, String>>> valuesToPair = new HashMap<String, ArrayList<Pair<String, String>>>();
 	
@@ -59,7 +60,7 @@ public class Mapper
 			}
 			
 			final int prefixIndex = new String(prefix + "_").length();
-			Pair<String, String> pair = new Pair<String, String>(name, name.substring(prefixIndex));
+			Pair<String, String> pair = new Pair<String, String>(name.substring(prefixIndex), name);
 			
 			//get the arraylist, add to it, and put it back
 			ArrayList<Pair<String, String>> prefixList = valuesToPair.get(prefix);
