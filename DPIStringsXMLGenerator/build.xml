@@ -45,13 +45,7 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="RunDPIStringsXMLGenerator">
-        <java classname="com.jakway.stringsgen.Main" failonerror="true" fork="yes">
-            <classpath refid="DPIStringsXMLGenerator.classpath"/>
-        </java>
-    </target>
-    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
-    <!--ANT 1.7 is required                                        -->
+    
     <target name="create_run_jar" depends="build">
         <jar destfile="dpi_strings_xml_generator.jar" filesetmanifest="mergewithoutmain">
             <manifest>
