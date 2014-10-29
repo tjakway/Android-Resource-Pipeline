@@ -22,7 +22,7 @@ public class XMLPostProcessor
 	public static final void removeStandaloneAttribute(File file) throws IOException
 	{
 		File tempFile = new File(file.getParentFile(), TEMP_FILENAME);
-		final String standaloneYes = "standalone=yes", standaloneNo = "standalone=no";
+		final String standaloneYes = "standalone=\"yes\"", standaloneNo = "standalone=\"no\"";
 		BufferedReader br=null;
 		try {
 		//check if the first line contains standalone=no or standalone=yes
@@ -34,7 +34,7 @@ public class XMLPostProcessor
 			return;
 		
 		//if it contains neither of those, we're done
-		if(!line.contains(standaloneYes) || !line.contains(standaloneNo))
+		if(!line.contains(standaloneYes) && !line.contains(standaloneNo))
 			return;
 		br.close();
 		br = null;
@@ -51,7 +51,22 @@ public class XMLPostProcessor
 			throw new DPIStringsGeneratorException("Error in XML postprocessing!");
 		}
 		
+		//remove the standalone string
 		String cleanedString = xmlFile.replaceFirst(standaloneStr, "");
+		//make the UTF encoding line undercase
+		cleanedString = xmlFile.replaceFirst("UTF-8", "utf-8");
+		//delete whitespace between the last attribute and the end of the line
+		StringBuilder builder = new StringBuilder(cleanedString);
+		final String utf = "\"utf-8\"";
+		int index = builder.indexOf(utf);
+		if(index != -1)
+		{
+			//delete everything between "utf-8" and the second ?
+			//since there should only be a space here, it should work
+			builder.replace(index+utf.length(), builder.indexOf("?", builder.indexOf("?")+1), ""); //gets the first index of ? and starts searching right after that, which fetches the second ?
+			cleanedString = builder.toString();
+		}
+		
 		
 		//rewrite the file
 		//copy to a temp file in the same directory
