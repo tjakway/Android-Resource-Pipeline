@@ -5,32 +5,39 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.jakway.stringsgen.file.ArgsUtils;
+import org.apache.commons.io.FileUtils;
+
 import com.jakway.stringsgen.file.FileChecks;
 import com.jakway.stringsgen.map.MapWriter;
 import com.jakway.stringsgen.map.Mapper;
 import com.jakway.stringsgen.misc.Pair;
+import com.jakway.stringsgen.options.OptionsHandler;
 import com.jakway.stringsgen.postprocessor.XMLPostProcessor;
 
 public class Main
 {
-	private static final int MIN_ARGS=2, MAX_ARGS=3;
 	private static final int EXIT_FAILURE=1;
 	
 	public static void main(String[] args)
-	{	
-		//file and input checks
-		if(args.length > MAX_ARGS || args.length < MIN_ARGS)
+	{
+		OptionsHandler optsHandler = new OptionsHandler();
+		
+		final File in_drawables_folder = optsHandler.getInputFolder(),
+				out_values_parent_folder = optsHandler.getOutputFolder();
+		boolean overwrite=false;
+		String defaultDPIPrefix=null;
+		try {
+		overwrite = optsHandler.getIfOverwrite();
+		defaultDPIPrefix = optsHandler.getDefaultDPIPrefix();
+		} catch(Exception e)
 		{
-			System.err.println(USAGE);
+			System.err.println("Exception while processing command line arguments.  Program will terminate with no modified files.");
 			System.exit(EXIT_FAILURE);
 		}
 		
-		File in_drawables_folder = new File(args[0]),
-				out_values_parent_folder = new File(args[1]);
-		
 		FileChecks.checkDrawableInputFolder(in_drawables_folder);
 		
+		//check if the output dir is empty, create it if it doesn't exist
 		boolean empty = false;
 		try {
 			if(out_values_parent_folder.exists())
@@ -48,8 +55,33 @@ public class Main
 			System.exit(EXIT_FAILURE);
 		}
 		
-		if(!empty)
-			ArgsUtils.checkOverwriteOption(args, out_values_parent_folder, USAGE);
+		//no point in deleting & remaking the output folder if it's already empty
+		if(!empty && overwrite == true)
+		{
+			final File folderToDelete = out_values_parent_folder;
+			System.out.println("--overwrite-on recognized.  Deleting output directory"+folderToDelete.toString());
+			//overwite on
+			//delete the output dir
+			//outputDir.delete();
+			try {
+				//delete the folder if it exists
+				if(folderToDelete.exists())
+				{
+					//use Apache IO Commons to delete the folder
+					FileUtils.deleteDirectory(folderToDelete);
+					
+					//don't forget to re-create the directory after!
+					if(!folderToDelete.mkdir())
+						throw new IOException("Failed to recreate directory "+folderToDelete.toString()+" after deleting it!");
+				}
+			}
+			catch(IOException e)
+			{
+				System.err.println("ERROR: Could not delete output directory!");
+				System.exit(EXIT_FAILURE);
+			}
+		}
+
 		
 		//map the assets to output data
 		Mapper mapper = new Mapper(in_drawables_folder, out_values_parent_folder);

@@ -93,7 +93,7 @@ public class OptionsHandler
 	 * @return
 	 * @throws UnrecognizedOptionException if the user passed an invalid prefix
 	 */
-	public String getDefaultDPI() throws UnrecognizedOptionException
+	public String getDefaultDPIPrefix() throws UnrecognizedOptionException
 	{
 		String value = allOptions.getOption(default_dpi).getValue();
 		
