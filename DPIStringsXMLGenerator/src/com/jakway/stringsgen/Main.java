@@ -14,7 +14,6 @@ import com.jakway.stringsgen.postprocessor.XMLPostProcessor;
 
 public class Main
 {
-	private static final String USAGE="This is the DPI Strings XML Generator.  Call with the following arguments:\n1. the input folder--should be the 'assets' folder.\n2. the output folder.  values-xxxx (e.g. values-ldpi, values-mdpi...) subfolders will be created in this folder.\n3. optional --overwrite=on option to delete the output folder if it already exists before writing to it.";
 	private static final int MIN_ARGS=2, MAX_ARGS=3;
 	private static final int EXIT_FAILURE=1;
 	
