@@ -5,6 +5,8 @@ import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 
+import com.jakway.stringsgen.prefixes.PrefixHandler;
+
 /**
  * returns a list of files that shouldn't be there:
  * -files that aren't in image_extensions
@@ -31,7 +33,7 @@ public class NotImageIOChecker implements IOFileFilter
 		//accept all non-SVG image files (any file with an extension in image_extensions)
 		else
 		{
-			if(FilenameUtils.isExtension(name, FileChecks.image_extensions))
+			if(FilenameUtils.isExtension(name, PrefixHandler.image_extensions))
 				return false;
 			else
 				return true;

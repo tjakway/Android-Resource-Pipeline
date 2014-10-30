@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
 import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
+import com.jakway.stringsgen.misc.Pair;
 
 public class XMLPostProcessor
 {
@@ -110,6 +112,20 @@ public class XMLPostProcessor
 		for(File xmlFile : files)
 		{
 			removeStandaloneAttribute(xmlFile);
+		}
+	}
+	
+	public static final void copyDefaultDPI(String default_dpi_prefix, Map<String, ArrayList<Pair<String, String>>> map)
+	{
+		//already checked that the passed default dpi prefix is a valid dpi prefix
+		//search the map for the corresponding values folder
+		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : map.entrySet())
+		{
+			ArrayList<Pair<String, String>> list = entry.getValue();
+			Pair<String, String> firstPair = list.get(0); //all of the values in the pairs will start with the DPI prefix
+			//get the first char
+			char firstChar = firstPair.getRight().charAt(0);
+			
 		}
 	}
 }

@@ -10,6 +10,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.jakway.stringsgen.file.FileChecks;
+import com.jakway.stringsgen.prefixes.PrefixHandler;
 
 public class OptionsHandler
 {
@@ -98,7 +99,7 @@ public class OptionsHandler
 		String value = allOptions.getOption(default_dpi).getValue();
 		
 		//check if the passed value is a valid prefix
-		for(String prefix : FileChecks.prefixes)
+		for(String prefix : PrefixHandler.prefixes)
 		{
 			if(value.equals(prefix))
 				return value;

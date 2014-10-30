@@ -11,6 +11,7 @@ import org.apache.commons.io.filefilter.HiddenFileFilter;
 
 import com.jakway.stringsgen.file.FileChecks;
 import com.jakway.stringsgen.misc.Pair;
+import com.jakway.stringsgen.prefixes.PrefixHandler;
 
 public class Mapper
 {
@@ -30,9 +31,9 @@ public class Mapper
 		}
 		
 		//initialize the map with empty arraylists
-		for(int i = 0; i < FileChecks.prefixes.length; i++)
+		for(int i = 0; i < PrefixHandler.prefixes.length; i++)
 		{
-			valuesToPair.put(FileChecks.prefixes[i], new ArrayList<Pair<String, String>>());
+			valuesToPair.put(PrefixHandler.prefixes[i], new ArrayList<Pair<String, String>>());
 		}
 			
 		//don't traverse subdirectories
@@ -45,18 +46,18 @@ public class Mapper
 			//get the prefix
 			String prefix = null;
 			//need to handle hdpi, xhdpi, and xxhdpi specially because endsWith("hdpi") is also true for xxhdpi and xhdpi
-			if(name.startsWith(FileChecks.HDPI_PREFIX) && !name.startsWith(FileChecks.XHDPI_PREFIX) && !name.startsWith(FileChecks.XXHDPI_PREFIX))
-				prefix = FileChecks.HDPI_PREFIX;
-			else if(name.startsWith(FileChecks.XHDPI_PREFIX) && !name.startsWith(FileChecks.XXHDPI_PREFIX))
-				prefix = FileChecks.XHDPI_PREFIX;
+			if(name.startsWith(PrefixHandler.HDPI_PREFIX) && !name.startsWith(PrefixHandler.XHDPI_PREFIX) && !name.startsWith(PrefixHandler.XXHDPI_PREFIX))
+				prefix = PrefixHandler.HDPI_PREFIX;
+			else if(name.startsWith(PrefixHandler.XHDPI_PREFIX) && !name.startsWith(PrefixHandler.XXHDPI_PREFIX))
+				prefix = PrefixHandler.XHDPI_PREFIX;
 			//ends with xxhdpi is also true for hdpi and xhdpi so have to return it before the general check all prefixes or the loop hits hdpi before xxhdpi and returns hdpi
-			else if(name.startsWith(FileChecks.XXHDPI_PREFIX))
-				prefix = FileChecks.XXHDPI_PREFIX;
+			else if(name.startsWith(PrefixHandler.XXHDPI_PREFIX))
+				prefix = PrefixHandler.XXHDPI_PREFIX;
 			
-			for(int i = 0; i < FileChecks.prefixes.length; i++)
+			for(int i = 0; i < PrefixHandler.prefixes.length; i++)
 			{
-			if(name.startsWith(FileChecks.prefixes[i]))
-				prefix = FileChecks.prefixes[i];
+			if(name.startsWith(PrefixHandler.prefixes[i]))
+				prefix = PrefixHandler.prefixes[i];
 			}
 			
 			final int prefixIndex = new String(prefix + "_").length();
