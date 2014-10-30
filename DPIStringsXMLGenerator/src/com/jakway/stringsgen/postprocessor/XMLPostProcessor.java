@@ -11,9 +11,11 @@ import org.apache.commons.io.FileUtils;
 
 import com.jakway.stringsgen.exception.DPIStringsGeneratorException;
 import com.jakway.stringsgen.misc.Pair;
+import com.jakway.stringsgen.prefixes.PrefixHandler;
 
 public class XMLPostProcessor
 {
+	private static final String DEFAULT_VALUES_FOLDER_NAME="values";
 	private static final String TEMP_FILENAME=".xmlpostprocesstemp";
 	
 	/**
@@ -115,17 +117,12 @@ public class XMLPostProcessor
 		}
 	}
 	
-	public static final void copyDefaultDPI(String default_dpi_prefix, Map<String, ArrayList<Pair<String, String>>> map)
+	public static final void copyDefaultDPI(String default_dpi_prefix, File out, Map<String, ArrayList<Pair<String, String>>> map) throws IOException
 	{
-		//already checked that the passed default dpi prefix is a valid dpi prefix
-		//search the map for the corresponding values folder
-		for(Map.Entry<String, ArrayList<Pair<String, String>>> entry : map.entrySet())
-		{
-			ArrayList<Pair<String, String>> list = entry.getValue();
-			Pair<String, String> firstPair = list.get(0); //all of the values in the pairs will start with the DPI prefix
-			//get the first char
-			char firstChar = firstPair.getRight().charAt(0);
-			
-		}
+		//get the folder indicated by the default DPI the user passed
+		File folderToCopy = PrefixHandler.getFolderForPrefix(default_dpi_prefix, out, map);
+		
+		File defaultFolder = new File(out, DEFAULT_VALUES_FOLDER_NAME);
+		FileUtils.copyDirectoryToDirectory(folderToCopy, defaultFolder);
 	}
 }

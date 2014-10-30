@@ -9,7 +9,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
-import com.jakway.stringsgen.file.FileChecks;
 import com.jakway.stringsgen.prefixes.PrefixHandler;
 
 public class OptionsHandler
