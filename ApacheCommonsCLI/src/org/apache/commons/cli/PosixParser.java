@@ -26,13 +26,14 @@ import java.util.List;
  * The class PosixParser provides an implementation of the
  * {@link Parser#flatten(Options,String[],boolean) flatten} method.
  *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 695760 $, $Date: 2008-09-16 01:05:03 -0700 (Tue, 16 Sep 2008) $
+ * @version $Id: PosixParser.java 1443102 2013-02-06 18:12:16Z tn $
+ * @deprecated since 1.3, use the {@link DefaultParser} instead
  */
+@Deprecated
 public class PosixParser extends Parser
 {
     /** holder for flattened tokens */
-    private List tokens = new ArrayList();
+    private List<String> tokens = new ArrayList<String>();
 
     /** specifies if bursting should continue */
     private boolean eatTheRest;
@@ -92,35 +93,48 @@ public class PosixParser extends Parser
      * when an non option is found.
      * @return The flattened <code>arguments</code> String array.
      */
-    protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption)
+    @Override
+    protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption) throws ParseException
     {
         init();
         this.options = options;
 
         // an iterator for the command line tokens
-        Iterator iter = Arrays.asList(arguments).iterator();
+        Iterator<String> iter = Arrays.asList(arguments).iterator();
 
         // process each command line token
         while (iter.hasNext())
         {
             // get the next command line token
-            String token = (String) iter.next();
+            String token = iter.next();
 
+            // single or double hyphen
+            if ("-".equals(token) || "--".equals(token))
+            {
+                tokens.add(token);
+            }
+            
             // handle long option --foo or --foo=bar
-            if (token.startsWith("--"))
+            else if (token.startsWith("--"))
             {
                 int pos = token.indexOf('=');
                 String opt = pos == -1 ? token : token.substring(0, pos); // --foo
+                
+                List<String> matchingOpts = options.getMatchingOptions(opt);
 
-                if (!options.hasOption(opt))
+                if (matchingOpts.isEmpty())
                 {
                     processNonOptionToken(token, stopAtNonOption);
                 }
+                else if (matchingOpts.size() > 1)
+                {
+                    throw new AmbiguousOptionException(opt, matchingOpts);
+                }
                 else
                 {
-                    currentOption = options.getOption(opt);
+                    currentOption = options.getOption(matchingOpts.get(0));
                     
-                    tokens.add(opt);
+                    tokens.add("--" + currentOption.getLongOpt());
                     if (pos != -1)
                     {
                         tokens.add(token.substring(pos + 1));
@@ -128,16 +142,24 @@ public class PosixParser extends Parser
                 }
             }
 
-            // single hyphen
-            else if ("-".equals(token))
-            {
-                tokens.add(token);
-            }
             else if (token.startsWith("-"))
             {
                 if (token.length() == 2 || options.hasOption(token))
                 {
                     processOptionToken(token, stopAtNonOption);
+                }
+                else if (!options.getMatchingOptions(token).isEmpty())
+                {
+                    List<String> matchingOpts = options.getMatchingOptions(token);
+                    if (matchingOpts.size() > 1)
+                    {
+                        throw new AmbiguousOptionException(token, matchingOpts);
+                    }
+                    else
+                    {
+                        Option opt = options.getOption(matchingOpts.get(0));
+                        processOptionToken("-" + opt.getLongOpt(), stopAtNonOption);
+                    }
                 }
                 // requires bursting
                 else
@@ -153,7 +175,7 @@ public class PosixParser extends Parser
             gobble(iter);
         }
 
-        return (String[]) tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[tokens.size()]);
     }
 
     /**
@@ -161,7 +183,7 @@ public class PosixParser extends Parser
      *
      * @param iter An iterator over the remaining tokens
      */
-    private void gobble(Iterator iter)
+    private void gobble(Iterator<String> iter)
     {
         if (eatTheRest)
         {

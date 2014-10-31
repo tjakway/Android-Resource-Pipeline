@@ -23,12 +23,14 @@ import java.util.Iterator;
 /**
  * Thrown when a required option has not been provided.
  *
- * @author John Keyes ( john at integralsource.com )
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: MissingOptionException.java 1443102 2013-02-06 18:12:16Z tn $
  */
 public class MissingOptionException extends ParseException
 {
-    /** The list of missing options */
+    /** This exception {@code serialVersionUID}. */
+    private static final long serialVersionUID = 8161889051578563249L;
+
+    /** The list of missing options and groups */
     private List missingOptions;
 
     /**
@@ -46,7 +48,7 @@ public class MissingOptionException extends ParseException
      * Constructs a new <code>MissingSelectedException</code> with the
      * specified list of missing options.
      *
-     * @param missingOptions the list of missing options
+     * @param missingOptions the list of missing options and groups
      * @since 1.2
      */
     public MissingOptionException(List missingOptions)
@@ -56,9 +58,10 @@ public class MissingOptionException extends ParseException
     }
 
     /**
-     * Return the list of options (as strings) missing in the command line parsed.
+     * Returns the list of options or option groups missing in the command line parsed.
      *
-     * @return the missing options
+     * @return the missing options, consisting of String instances for simple
+     *         options, and OptionGroup instances for required option groups.
      * @since 1.2
      */
     public List getMissingOptions()
@@ -69,25 +72,25 @@ public class MissingOptionException extends ParseException
     /**
      * Build the exception message from the specified list of options.
      *
-     * @param missingOptions
+     * @param missingOptions the list of missing options and groups
      * @since 1.2
      */
-    private static String createMessage(List missingOptions)
+    private static String createMessage(List<?> missingOptions)
     {
-        StringBuffer buff = new StringBuffer("Missing required option");
-        buff.append(missingOptions.size() == 1 ? "" : "s");
-        buff.append(": ");
+        StringBuilder buf = new StringBuilder("Missing required option");
+        buf.append(missingOptions.size() == 1 ? "" : "s");
+        buf.append(": ");
 
-        Iterator it = missingOptions.iterator();
+        Iterator<?> it = missingOptions.iterator();
         while (it.hasNext())
         {
-            buff.append(it.next());
+            buf.append(it.next());
             if (it.hasNext())
             {
-                buff.append(", ");
+                buf.append(", ");
             }
         }
 
-        return buff.toString();
+        return buf.toString();
     }
 }

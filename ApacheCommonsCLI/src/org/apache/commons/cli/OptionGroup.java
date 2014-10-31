@@ -26,15 +26,15 @@ import java.util.Map;
 /**
  * A group of mutually exclusive options.
  *
- * @author John Keyes ( john at integralsource.com )
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: OptionGroup.java 1443102 2013-02-06 18:12:16Z tn $
  */
 public class OptionGroup implements Serializable
 {
+    /** The serial version UID. */
     private static final long serialVersionUID = 1L;
     
     /** hold the options */
-    private Map optionMap = new HashMap();
+    private Map<String, Option> optionMap = new HashMap<String, Option>();
 
     /** the name of the selected option */
     private String selected;
@@ -61,7 +61,7 @@ public class OptionGroup implements Serializable
      * @return the names of the options in this group as a 
      * <code>Collection</code>
      */
-    public Collection getNames()
+    public Collection<String> getNames()
     {
         // the key set is the collection of names
         return optionMap.keySet();
@@ -70,7 +70,7 @@ public class OptionGroup implements Serializable
     /**
      * @return the options in this group as a <code>Collection</code>
      */
-    public Collection getOptions()
+    public Collection<Option> getOptions()
     {
         // the values are the collection of options
         return optionMap.values();
@@ -85,12 +85,19 @@ public class OptionGroup implements Serializable
      */
     public void setSelected(Option option) throws AlreadySelectedException
     {
+        if (option == null)
+        {
+            // reset the option previously selected
+            selected = null;
+            return;
+        }
+        
         // if no option has already been selected or the 
         // same option is being reselected then set the
         // selected member variable
-        if (selected == null || selected.equals(option.getOpt()))
+        if (selected == null || selected.equals(option.getKey()))
         {
-            selected = option.getOpt();
+            selected = option.getKey();
         }
         else
         {
@@ -129,17 +136,18 @@ public class OptionGroup implements Serializable
      * 
      * @return the stringified representation of this group
      */
+    @Override
     public String toString()
     {
-        StringBuffer buff = new StringBuffer();
-
-        Iterator iter = getOptions().iterator();
+        StringBuilder buff = new StringBuilder();
+        
+        Iterator<Option> iter = getOptions().iterator();
 
         buff.append("[");
 
         while (iter.hasNext())
         {
-            Option option = (Option) iter.next();
+            Option option = iter.next();
 
             if (option.getOpt() != null)
             {
@@ -151,10 +159,13 @@ public class OptionGroup implements Serializable
                 buff.append("--");
                 buff.append(option.getLongOpt());
             }
-
-            buff.append(" ");
-            buff.append(option.getDescription());
-
+            
+            if (option.getDescription() != null)
+            {
+                buff.append(" ");
+                buff.append(option.getDescription());
+            }
+            
             if (iter.hasNext())
             {
                 buff.append(", ");

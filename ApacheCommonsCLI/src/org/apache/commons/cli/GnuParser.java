@@ -24,9 +24,10 @@ import java.util.List;
  * The class GnuParser provides an implementation of the
  * {@link Parser#flatten(Options, String[], boolean) flatten} method.
  *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: GnuParser.java 1445352 2013-02-12 20:48:19Z tn $
+ * @deprecated since 1.3, use the {@link DefaultParser} instead
  */
+@Deprecated
 public class GnuParser extends Parser
 {
     /**
@@ -46,9 +47,10 @@ public class GnuParser extends Parser
      *                        a non option has been encountered
      * @return a String array of the flattened arguments
      */
+    @Override
     protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption)
     {
-        List tokens = new ArrayList();
+        List<String> tokens = new ArrayList<String>();
 
         boolean eatTheRest = false;
 
@@ -101,13 +103,13 @@ public class GnuParser extends Parser
 
             if (eatTheRest)
             {
-                for (i++; i < arguments.length; i++)
+                for (i++; i < arguments.length; i++) //NOPMD
                 {
                     tokens.add(arguments[i]);
                 }
             }
         }
 
-        return (String[]) tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[tokens.size()]);
     }
 }

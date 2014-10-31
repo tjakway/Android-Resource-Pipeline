@@ -21,11 +21,15 @@ package org.apache.commons.cli;
  * Exception thrown during parsing signalling an unrecognized
  * option was seen.
  *
- * @author bob mcwhiter (bob @ werken.com)
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: UnrecognizedOptionException.java 1443102 2013-02-06 18:12:16Z tn $
  */
 public class UnrecognizedOptionException extends ParseException
 {
+    /**
+     * This exception {@code serialVersionUID}.
+     */
+    private static final long serialVersionUID = -252504690284625623L;
+
     /** The  unrecognized option */
     private String option;
 

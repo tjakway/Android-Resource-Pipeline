@@ -20,13 +20,12 @@ package org.apache.commons.cli;
 /**
  * Contains useful helper methods for classes within this package.
  *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: Util.java 1443102 2013-02-06 18:12:16Z tn $
  */
-class Util
+final class Util
 {
     /**
-     * Remove the hyphens from the begining of <code>str</code> and
+     * Remove the hyphens from the beginning of <code>str</code> and
      * return the new String.
      *
      * @param str The string from which the hyphens should be removed.
@@ -62,14 +61,12 @@ class Util
      */
     static String stripLeadingAndTrailingQuotes(String str)
     {
-        if (str.startsWith("\""))
+        int length = str.length();
+        if (length > 1 && str.startsWith("\"") && str.endsWith("\"") && str.substring(1, length - 1).indexOf('"') == -1)
         {
-            str = str.substring(1, str.length());
+            str = str.substring(1, length - 1);
         }
-        if (str.endsWith("\""))
-        {
-            str = str.substring(0, str.length() - 1);
-        }
+        
         return str;
     }
 }

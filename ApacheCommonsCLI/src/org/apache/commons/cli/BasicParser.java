@@ -21,9 +21,10 @@ package org.apache.commons.cli;
  * The class BasicParser provides a very simple implementation of
  * the {@link Parser#flatten(Options,String[],boolean) flatten} method.
  *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: BasicParser.java 1443102 2013-02-06 18:12:16Z tn $
+ * @deprecated since 1.3, use the {@link DefaultParser} instead
  */
+@Deprecated
 public class BasicParser extends Parser
 {
     /**
@@ -39,7 +40,10 @@ public class BasicParser extends Parser
      * when an non option is found.
      * @return The <code>arguments</code> String array.
      */
-    protected String[] flatten(Options options, String[] arguments, boolean stopAtNonOption)
+    @Override
+    protected String[] flatten(@SuppressWarnings("unused") Options options,
+            String[] arguments,
+            @SuppressWarnings("unused") boolean stopAtNonOption)
     {
         // just echo the arguments
         return arguments;

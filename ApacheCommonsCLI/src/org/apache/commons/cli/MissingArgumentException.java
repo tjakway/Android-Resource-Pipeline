@@ -21,11 +21,15 @@ package org.apache.commons.cli;
  * Thrown when an option requiring an argument
  * is not provided with an argument.
  *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: MissingArgumentException.java 1443102 2013-02-06 18:12:16Z tn $
  */
 public class MissingArgumentException extends ParseException
 {
+    /**
+     * This exception {@code serialVersionUID}.
+     */
+    private static final long serialVersionUID = -7098538588704965017L;
+
     /** The option requiring additional arguments */
     private Option option;
 

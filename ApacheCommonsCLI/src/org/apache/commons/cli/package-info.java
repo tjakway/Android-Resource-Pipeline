@@ -15,28 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.commons.cli;
-
 /**
- * Base for Exceptions thrown during parsing of a command-line.
- *
- * @version $Id: ParseException.java 1443102 2013-02-06 18:12:16Z tn $
+ * Commons CLI 1.3
+ * 
+ * @version $Id: package-info.java 1443102 2013-02-06 18:12:16Z tn $
  */
-public class ParseException extends Exception
-{
-    /**
-     * This exception {@code serialVersionUID}.
-     */
-    private static final long serialVersionUID = 9112808380089253192L;
-
-    /**
-     * Construct a new <code>ParseException</code>
-     * with the specified detail message.
-     *
-     * @param message the detail message
-     */
-    public ParseException(String message)
-    {
-        super(message);
-    }
-}
+package org.apache.commons.cli;

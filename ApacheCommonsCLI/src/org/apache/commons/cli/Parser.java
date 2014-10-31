@@ -20,7 +20,6 @@ package org.apache.commons.cli;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
@@ -28,9 +27,10 @@ import java.util.Properties;
 /**
  * <code>Parser</code> creates {@link CommandLine}s.
  *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: Parser.java 1445352 2013-02-12 20:48:19Z tn $
+ * @deprecated since 1.3, the two-pass parsing with the flatten method is not enough flexible to handle complex cases
  */
+@Deprecated
 public abstract class Parser implements CommandLineParser
 {
     /** commandline instance */
@@ -42,7 +42,7 @@ public abstract class Parser implements CommandLineParser
     /** list of required options strings */
     private List requiredOptions;
 
-    protected void setOptions(final Options options)
+    protected void setOptions(Options options)
     {
         this.options = options;
         this.requiredOptions = new ArrayList(options.getRequiredOptions());
@@ -68,11 +68,12 @@ public abstract class Parser implements CommandLineParser
      * flattening when a non option has been encountered
      * @return a String array of the flattened arguments
      */
-    protected abstract String[] flatten(Options opts, String[] arguments, boolean stopAtNonOption);
+    protected abstract String[] flatten(Options opts, String[] arguments, boolean stopAtNonOption)
+            throws ParseException;
 
     /**
      * Parses the specified <code>arguments</code> based
-     * on the specifed {@link Options}.
+     * on the specified {@link Options}.
      *
      * @param options the <code>Options</code>
      * @param arguments the <code>arguments</code>
@@ -104,13 +105,14 @@ public abstract class Parser implements CommandLineParser
 
     /**
      * Parses the specified <code>arguments</code>
-     * based on the specifed {@link Options}.
+     * based on the specified {@link Options}.
      *
      * @param options         the <code>Options</code>
      * @param arguments       the <code>arguments</code>
-     * @param stopAtNonOption specifies whether to stop interpreting the
-     *                        arguments when a non option has been encountered
-     *                        and to add them to the CommandLines args list.
+     * @param stopAtNonOption if <tt>true</tt> an unrecognized argument stops
+     *     the parsing and the remaining arguments are added to the 
+     *     {@link CommandLine}s args list. If <tt>false</tt> an unrecognized
+     *     argument triggers a ParseException.
      * @return the <code>CommandLine</code>
      * @throws ParseException if an error occurs when parsing the arguments.
      */
@@ -126,8 +128,10 @@ public abstract class Parser implements CommandLineParser
      * @param options the specified Options
      * @param arguments the command line arguments
      * @param properties command line option name-value pairs
-     * @param stopAtNonOption stop parsing the arguments when the first
-     * non option is encountered.
+     * @param stopAtNonOption if <tt>true</tt> an unrecognized argument stops
+     *     the parsing and the remaining arguments are added to the 
+     *     {@link CommandLine}s args list. If <tt>false</tt> an unrecognized
+     *     argument triggers a ParseException.
      *
      * @return the list of atomic option and value tokens
      *
@@ -140,11 +144,16 @@ public abstract class Parser implements CommandLineParser
             throws ParseException
     {
         // clear out the data in options in case it's been used before (CLI-71)
-        for (Iterator it = options.helpOptions().iterator(); it.hasNext();)
+        for (Option opt : options.helpOptions())
         {
-            Option opt = (Option) it.next();
             opt.clearValues();
         }
+        
+        // clear the data from the groups
+        for (OptionGroup group : options.getOptionGroups())
+        {
+            group.setSelected(null);
+        }        
 
         // initialise members
         setOptions(options);
@@ -158,14 +167,14 @@ public abstract class Parser implements CommandLineParser
             arguments = new String[0];
         }
 
-        List tokenList = Arrays.asList(flatten(getOptions(), arguments, stopAtNonOption));
+        List<String> tokenList = Arrays.asList(flatten(getOptions(), arguments, stopAtNonOption));
 
-        ListIterator iterator = tokenList.listIterator();
+        ListIterator<String> iterator = tokenList.listIterator();
 
         // process each flattened token
         while (iterator.hasNext())
         {
-            String t = (String) iterator.next();
+            String t = iterator.next();
 
             // the value is the double-dash
             if ("--".equals(t))
@@ -216,7 +225,7 @@ public abstract class Parser implements CommandLineParser
             {
                 while (iterator.hasNext())
                 {
-                    String str = (String) iterator.next();
+                    String str = iterator.next();
 
                     // ensure only one double-dash is added
                     if (!"--".equals(str))
@@ -238,21 +247,29 @@ public abstract class Parser implements CommandLineParser
      *
      * @param properties The value properties to be processed.
      */
-    protected void processProperties(Properties properties)
+    protected void processProperties(Properties properties) throws ParseException
     {
         if (properties == null)
         {
             return;
         }
 
-        for (Enumeration e = properties.propertyNames(); e.hasMoreElements();)
+        for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();)
         {
             String option = e.nextElement().toString();
-
-            if (!cmd.hasOption(option))
+            
+            Option opt = options.getOption(option);
+            if (opt == null)
             {
-                Option opt = getOptions().getOption(option);
-
+                throw new UnrecognizedOptionException("Default option wasn't defined", option);
+            }
+            
+            // if the option is part of a group, check if another option of the group has been selected
+            OptionGroup group = options.getOptionGroup(opt);
+            boolean selected = group != null && group.getSelected() != null;
+            
+            if (!cmd.hasOption(option) && !selected)
+            {
                 // get the value from the properties instance
                 String value = properties.getProperty(option);
 
@@ -264,7 +281,7 @@ public abstract class Parser implements CommandLineParser
                         {
                             opt.addValueForProcessing(value);
                         }
-                        catch (RuntimeException exp)
+                        catch (RuntimeException exp) //NOPMD
                         {
                             // if we cannot add the value don't worry about it
                         }
@@ -276,10 +293,11 @@ public abstract class Parser implements CommandLineParser
                 {
                     // if the value is not yes, true or 1 then don't add the
                     // option to the CommandLine
-                    break;
+                    continue;
                 }
 
                 cmd.addOption(opt);
+                updateRequiredOptions(opt);
             }
         }
     }
@@ -288,12 +306,11 @@ public abstract class Parser implements CommandLineParser
      * Throws a {@link MissingOptionException} if all of the required options
      * are not present.
      *
-     * @throws MissingOptionException if any of the required Options
-     * are not present.
+     * @throws MissingOptionException if any of the required Options are not present.
      */
     protected void checkRequiredOptions() throws MissingOptionException
     {
-        // if there are required options that have not been processsed
+        // if there are required options that have not been processed
         if (!getRequiredOptions().isEmpty())
         {
             throw new MissingOptionException(getRequiredOptions());
@@ -301,24 +318,23 @@ public abstract class Parser implements CommandLineParser
     }
 
     /**
-     * <p>Process the argument values for the specified Option
+     * Process the argument values for the specified Option
      * <code>opt</code> using the values retrieved from the
      * specified iterator <code>iter</code>.
      *
      * @param opt The current Option
-     * @param iter The iterator over the flattened command line
-     * Options.
+     * @param iter The iterator over the flattened command line Options.
      *
      * @throws ParseException if an argument value is required
      * and it is has not been found.
      */
-    public void processArgs(Option opt, ListIterator iter) throws ParseException
+    public void processArgs(Option opt, ListIterator<String> iter) throws ParseException
     {
         // loop until an option is found
         while (iter.hasNext())
         {
-            String str = (String) iter.next();
-
+            String str = iter.next();
+            
             // found an Option, not an argument
             if (getOptions().hasOption(str) && str.startsWith("-"))
             {
@@ -346,14 +362,14 @@ public abstract class Parser implements CommandLineParser
 
     /**
      * Process the Option specified by <code>arg</code> using the values
-     * retrieved from the specfied iterator <code>iter</code>.
+     * retrieved from the specified iterator <code>iter</code>.
      *
      * @param arg The String value representing an Option
      * @param iter The iterator over the flattened command line arguments.
      *
      * @throws ParseException if <code>arg</code> does not represent an Option
      */
-    protected void processOption(String arg, ListIterator iter) throws ParseException
+    protected void processOption(String arg, ListIterator<String> iter) throws ParseException
     {
         boolean hasOption = getOptions().hasOption(arg);
 
@@ -365,7 +381,27 @@ public abstract class Parser implements CommandLineParser
 
         // get the option represented by arg
         Option opt = (Option) getOptions().getOption(arg).clone();
+        
+        // update the required options and groups
+        updateRequiredOptions(opt);
+        
+        // if the option takes an argument value
+        if (opt.hasArg())
+        {
+            processArgs(opt, iter);
+        }
+        
+        // set the option on the command line
+        cmd.addOption(opt);
+    }
 
+    /**
+     * Removes the option or its group from the list of expected elements.
+     * 
+     * @param opt
+     */
+    private void updateRequiredOptions(Option opt) throws ParseException
+    {
         // if the option is a required option remove the option from
         // the requiredOptions list
         if (opt.isRequired())
@@ -386,14 +422,5 @@ public abstract class Parser implements CommandLineParser
 
             group.setSelected(opt);
         }
-
-        // if the option takes an argument value
-        if (opt.hasArg())
-        {
-            processArgs(opt, iter);
-        }
-
-        // set the option on the command line
-        cmd.addOption(opt);
     }
 }

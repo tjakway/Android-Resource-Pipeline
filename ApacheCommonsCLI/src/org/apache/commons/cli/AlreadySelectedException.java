@@ -21,11 +21,15 @@ package org.apache.commons.cli;
  * Thrown when more than one option in an option group
  * has been provided.
  *
- * @author John Keyes ( john at integralsource.com )
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: AlreadySelectedException.java 1443102 2013-02-06 18:12:16Z tn $
  */
 public class AlreadySelectedException extends ParseException
 {
+    /**
+     * This exception {@code serialVersionUID}.
+     */
+    private static final long serialVersionUID = 3674381532418544760L;
+
     /** The option group selected. */
     private OptionGroup group;
 

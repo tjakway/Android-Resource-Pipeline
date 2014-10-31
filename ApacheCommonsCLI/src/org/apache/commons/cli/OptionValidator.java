@@ -20,57 +20,56 @@ package org.apache.commons.cli;
 /**
  * Validates an Option string.
  *
- * @author John Keyes ( john at integralsource.com )
- * @version $Revision: 680644 $, $Date: 2008-07-29 01:13:48 -0700 (Tue, 29 Jul 2008) $
+ * @version $Id: OptionValidator.java 1544819 2013-11-23 15:34:31Z tn $
  * @since 1.1
  */
-class OptionValidator
+final class OptionValidator
 {
     /**
-     * Validates whether <code>opt</code> is a permissable Option
+     * Validates whether <code>opt</code> is a permissible Option
      * shortOpt.  The rules that specify if the <code>opt</code>
      * is valid are:
      *
      * <ul>
-     *  <li><code>opt</code> is not NULL</li>
      *  <li>a single character <code>opt</code> that is either
      *  ' '(special case), '?', '@' or a letter</li>
      *  <li>a multi character <code>opt</code> that only contains
      *  letters.</li>
      * </ul>
+     * <p>
+     * In case {@code opt} is {@code null} no further validation is performed.
      *
-     * @param opt The option string to validate
+     * @param opt The option string to validate, may be null
      * @throws IllegalArgumentException if the Option is not valid.
      */
     static void validateOption(String opt) throws IllegalArgumentException
     {
-        // check that opt is not NULL
+        // if opt is NULL do not check further
         if (opt == null)
         {
             return;
         }
-
+        
         // handle the single character opt
-        else if (opt.length() == 1)
+        if (opt.length() == 1)
         {
             char ch = opt.charAt(0);
 
             if (!isValidOpt(ch))
             {
-                throw new IllegalArgumentException("illegal option value '" + ch + "'");
+                throw new IllegalArgumentException("Illegal option name '" + ch + "'");
             }
         }
 
         // handle the multi character opt
         else
         {
-            char[] chars = opt.toCharArray();
-
-            for (int i = 0; i < chars.length; i++)
+            for (char ch : opt.toCharArray())
             {
-                if (!isValidChar(chars[i]))
+                if (!isValidChar(ch))
                 {
-                    throw new IllegalArgumentException("opt contains illegal character value '" + chars[i] + "'");
+                    throw new IllegalArgumentException("The option '" + opt + "' contains an illegal "
+                                                       + "character : '" + ch + "'");
                 }
             }
         }
@@ -80,12 +79,11 @@ class OptionValidator
      * Returns whether the specified character is a valid Option.
      *
      * @param c the option to validate
-     * @return true if <code>c</code> is a letter, ' ', '?' or '@',
-     *         otherwise false.
+     * @return true if <code>c</code> is a letter, '?' or '@', otherwise false.
      */
     private static boolean isValidOpt(char c)
     {
-        return isValidChar(c) || c == ' ' || c == '?' || c == '@';
+        return isValidChar(c) || c == '?' || c == '@';
     }
 
     /**

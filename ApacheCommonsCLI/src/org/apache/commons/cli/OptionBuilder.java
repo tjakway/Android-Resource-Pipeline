@@ -19,15 +19,17 @@ package org.apache.commons.cli;
 
 /**
  * OptionBuilder allows the user to create Options using descriptive methods.
- *
- * <p>Details on the Builder pattern can be found at
- * <a href="http://c2.com/cgi-bin/wiki?BuilderPattern">
- * http://c2.com/cgi-bin/wiki?BuilderPattern</a>.</p>
- *
- * @author John Keyes (john at integralsource.com)
- * @version $Revision: 754830 $, $Date: 2009-03-16 00:26:44 -0700 (Mon, 16 Mar 2009) $
+ * <p>
+ * Details on the Builder pattern can be found at
+ * <a href="http://c2.com/cgi-bin/wiki?BuilderPattern">http://c2.com/cgi-bin/wiki?BuilderPattern</a>.
+ * <p>
+ * This class is NOT thread safe. See <a href="https://issues.apache.org/jira/browse/CLI-209">CLI-209</a>
+ * 
+ * @version $Id: OptionBuilder.java 1447094 2013-02-17 22:32:21Z tn $
  * @since 1.0
+ * @deprecated since 1.3, use {@link Option.builder(String)} instead
  */
+@Deprecated
 public final class OptionBuilder
 {
     /** long option */
@@ -46,7 +48,7 @@ public final class OptionBuilder
     private static int numberOfArgs = Option.UNINITIALIZED;
 
     /** option type */
-    private static Object type;
+    private static Class<?> type;
 
     /** option can have an optional argument value */
     private static boolean optionalArg;
@@ -56,6 +58,12 @@ public final class OptionBuilder
 
     /** option builder instance */
     private static OptionBuilder instance = new OptionBuilder();
+
+    static
+    {
+        // ensure the consistency of the initial values
+        reset();
+    }
 
     /**
      * private constructor to prevent instances being created
@@ -71,14 +79,11 @@ public final class OptionBuilder
     private static void reset()
     {
         description = null;
-        argName = "arg";
+        argName = null;
         longopt = null;
-        type = null;
+        type = String.class;
         required = false;
         numberOfArgs = Option.UNINITIALIZED;
-
-
-        // PMM 9/6/02 - these were missing
         optionalArg = false;
         valuesep = (char) 0;
     }
@@ -150,15 +155,16 @@ public final class OptionBuilder
     /**
      * The next Option created uses <code>sep</code> as a means to
      * separate argument values.
-     *
+     * <p>
      * <b>Example:</b>
      * <pre>
-     * Option opt = OptionBuilder.withValueSeparator(':')
+     * Option opt = OptionBuilder.withValueSeparator('=')
      *                           .create('D');
      *
+     * String args = "-Dkey=value";
      * CommandLine line = parser.parse(args);
-     * String propertyName = opt.getValue(0);
-     * String propertyValue = opt.getValue(1);
+     * String propertyName = opt.getValue(0);  // will be "key"
+     * String propertyValue = opt.getValue(1); // will be "value"
      * </pre>
      *
      * @param sep The value separator to be used for the argument values.
@@ -278,11 +284,29 @@ public final class OptionBuilder
     /**
      * The next Option created will have a value that will be an instance
      * of <code>type</code>.
+     * <p>
+     * <b>Note:</b> this method is kept for binary compatibility and the
+     * input type is supposed to be a {@link Class} object. 
      *
      * @param newType the type of the Options argument value
      * @return the OptionBuilder instance
+     * @deprecated since 1.3, use {@link #withType(Class)} instead
      */
+    @Deprecated
     public static OptionBuilder withType(Object newType)
+    {
+        return withType((Class<?>) newType);
+    }
+
+    /**
+     * The next Option created will have a value that will be an instance
+     * of <code>type</code>.
+     *
+     * @param newType the type of the Options argument value
+     * @return the OptionBuilder instance
+     * @since 1.3
+     */
+    public static OptionBuilder withType(Class<?> newType)
     {
         OptionBuilder.type = newType;
 
@@ -346,7 +370,8 @@ public final class OptionBuilder
     public static Option create(String opt) throws IllegalArgumentException
     {
         Option option = null;
-        try {
+        try
+        {
             // create the option
             option = new Option(opt, description);
 
@@ -358,7 +383,9 @@ public final class OptionBuilder
             option.setType(type);
             option.setValueSeparator(valuesep);
             option.setArgName(argName);
-        } finally {
+        }
+        finally
+        {
             // reset the OptionBuilder properties
             OptionBuilder.reset();
         }
