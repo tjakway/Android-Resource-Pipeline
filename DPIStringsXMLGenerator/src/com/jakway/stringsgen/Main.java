@@ -19,11 +19,7 @@ public class Main
 	private static final int EXIT_FAILURE=1;
 	
 	public static void main(String[] args)
-	{
-		//FIXME: DEBUG
-		args = new String[] {"--input", "assets", "--output", "out_folder", "--default_dpi", "hdpi" , "--overwrite", "on"};
-		//FIXME: END DEBUG
-		
+	{	
 		OptionsHandler optsHandler = new OptionsHandler();
 		
 		
