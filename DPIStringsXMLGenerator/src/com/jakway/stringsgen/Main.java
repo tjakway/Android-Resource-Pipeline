@@ -20,18 +20,27 @@ public class Main
 	
 	public static void main(String[] args)
 	{
+		//FIXME: DEBUG
+		args = new String[] {"--input", "assets", "--output", "out_folder", "--default_dpi", "hdpi" , "--overwrite", "on"};
+		//FIXME: END DEBUG
+		
 		OptionsHandler optsHandler = new OptionsHandler();
 		
-		final File in_drawables_folder = optsHandler.getInputFolder(),
-				out_values_parent_folder = optsHandler.getOutputFolder();
+		
+		File in_drawables_folder=null,
+				out_values_parent_folder=null;
 		boolean overwrite=false;
 		String defaultDPIPrefix=null;
 		try {
+		optsHandler.parse(args);
+		in_drawables_folder = optsHandler.getInputFolder();
+		out_values_parent_folder = optsHandler.getOutputFolder();
 		overwrite = optsHandler.getIfOverwrite();
 		defaultDPIPrefix = optsHandler.getDefaultDPIPrefix();
 		} catch(Exception e)
 		{
 			System.err.println("Exception while processing command line arguments.  Program will terminate with no modified files.");
+			e.printStackTrace();
 			System.exit(EXIT_FAILURE);
 		}
 		
@@ -59,7 +68,7 @@ public class Main
 		if(!empty && overwrite == true)
 		{
 			final File folderToDelete = out_values_parent_folder;
-			System.out.println("--overwrite-on recognized.  Deleting output directory"+folderToDelete.toString());
+			System.out.println("--overwrite-on recognized.  Deleting output directory "+folderToDelete.toString());
 			//overwite on
 			//delete the output dir
 			//outputDir.delete();

@@ -16,7 +16,8 @@ import com.jakway.stringsgen.prefixes.PrefixHandler;
 public class XMLPostProcessor
 {
 	private static final String DEFAULT_VALUES_FOLDER_NAME="values";
-	private static final String TEMP_FILENAME=".xmlpostprocesstemp";
+	private static final String TEMP_FILENAME=".xmlpostprocesstemp",
+			STRINGS_XML_FILENAME="strings.xml";
 	
 	/**
 	 * removes the standalone=no or standalone=yes strings from the first line of the passed XML file
@@ -123,6 +124,9 @@ public class XMLPostProcessor
 		File folderToCopy = PrefixHandler.getFolderForPrefix(default_dpi_prefix, out, map);
 		
 		File defaultFolder = new File(out, DEFAULT_VALUES_FOLDER_NAME);
-		FileUtils.copyDirectoryToDirectory(folderToCopy, defaultFolder);
+		
+		//don't copy the directories, just the strings.xml file inside it
+		//FileUtils.copyFile will create the enclosing directory if it doesnt exist
+		FileUtils.copyFile(new File(folderToCopy, STRINGS_XML_FILENAME), new File(defaultFolder, STRINGS_XML_FILENAME));
 	}
 }

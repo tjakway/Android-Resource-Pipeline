@@ -44,7 +44,7 @@ public class PrefixHandler
 		for(String key : map.keySet())
 		{
 			if(prefix.equals(key))
-				return new File(out, key);
+				return new File(out, "values-"+key);
 		}
 		//this should never happen--we checked that the prefix exists
 		throw new PrefixNotFoundException(prefix, "Prefix not found in getFolderForPrefix!");
