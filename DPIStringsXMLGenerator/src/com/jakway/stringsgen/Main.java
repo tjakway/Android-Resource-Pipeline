@@ -103,14 +103,17 @@ public class Main
 			System.exit(EXIT_FAILURE);
 		}
 		
-		//handle 
-		/*try
+		//handle the default DPI prefix option
+		try
 		{
-			
+			XMLPostProcessor.copyDefaultDPI(defaultDPIPrefix, out_values_parent_folder, pairMap);
 		}
 		catch(IOException e)
 		{
-			
-		} */
+			//probably will never get here--an IO error would happen earlier
+			System.err.println("Error while copying the values-"+defaultDPIPrefix+" strings.xml to values folder.");
+			e.printStackTrace();
+			System.exit(EXIT_FAILURE);
+		} 
 	}
 }
