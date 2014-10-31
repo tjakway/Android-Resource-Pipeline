@@ -64,7 +64,7 @@
     </target>
     
     <target name="create_run_jar" depends="build">
-        <jar destfile="/Users/thomasjakway/workspace/dpi_strings_xml_generator.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="dpi_strings_xml_generator.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="com.jakway.stringsgen.Main"/>
                 <attribute name="Class-Path" value="."/>
