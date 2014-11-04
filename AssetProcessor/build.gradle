@@ -23,7 +23,7 @@ sourceSets {
 //tasks
 
 //don't run by default because we need external parameters
-defaultTasks 'clean', 'build'
+defaultTasks 'build', 'runnableJar'
 
 /*task clean << {
 
@@ -46,16 +46,16 @@ task runnableJar(type: Jar, dependsOn: 'build') {
 		"Main-Class": "com.jakway.assetprocessor.Main")
 	}
 	//package the JAR with all dependencies
-	baseName = "assetprocessor.jar"
+	baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
 //export the JAR to the filesystem
 //groovy will automatically export the JAR just from the task but this gives more control over its location
-def runnableJarFile = file('assetprocessor.jar')
+//def runnableJarFile = file('assetprocessor.jar')
 
 //groovy detects that it's a JAR artifact from the extension
-artifacts {
+/*artifacts {
 	archives runnableJarFile
-}
+}*/
