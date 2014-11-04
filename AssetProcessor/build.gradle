@@ -27,7 +27,7 @@ sourceSets {
 
 mainClassName = "com.jakway.assetprocessor.Main"
 
-defaultTasks 'build', 'runnableJar'
+defaultTasks 'build'
 
 //JAR creation
 task runnableJar(type: Jar, dependsOn: 'build') {

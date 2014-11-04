@@ -1,0 +1,18 @@
+/**
+ * assetIn, assetBin are files
+ * assetOverwrite is a boolean
+ */
+class AssetProcessorSettings {
+	//def creates setter and getter methods
+	def assetIn, assetBin, assetOverwrite
+
+	AssetProcessorSettings(assetIn, assetBin, assetOverwrite)
+	{
+		this.assetIn = assetIn
+		this.assetBin = assetBin
+		this.assetOverwrite = assetOverwrite;
+	}
+}
+assetProcessorSettings = new AssetProcessorSettings()
+
+
