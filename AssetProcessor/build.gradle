@@ -25,26 +25,30 @@ sourceSets {
 //don't run by default because we need external parameters
 defaultTasks 'clean', 'build'
 
-task clean << {
+/*task clean << {
 
-}
+}*/
 
-task build << {
+/*task build << {
 
-}
+}*/
 
 //must build before running
-task run(dependsOn: 'build') << {
+/*task run(dependsOn: 'build') << {
 
-}
+}*/
 
 //JAR creation
-task runnableJar(type: Jar, dependsOn: ') {
+task runnableJar(type: Jar, dependsOn: 'build') {
 	manifest {
 		attributes("Implementation-Title": "AssetProcessor",
 		"Implementaton-Version": "1.0",
-		"Main-Class": "com.jakway.assetprocessor.Main"
+		"Main-Class": "com.jakway.assetprocessor.Main")
 	}
+	//package the JAR with all dependencies
+	baseName = "assetprocessor.jar"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 //export the JAR to the filesystem
