@@ -1,0 +1,46 @@
+apply plugin: 'java'
+
+//dependencies management
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile 'commons-io:commons-io:2.4'
+}
+
+//tasks
+
+//don't run by default because we need external parameters
+defaultTasks 'clean', 'build'
+
+task clean << {
+
+}
+
+task build << {
+
+}
+
+//must build before running
+task run(dependsOn: 'build') << {
+
+}
+
+//JAR creation
+task runnableJar(type: Jar, dependsOn: ') {
+	manifest {
+		attributes("Implementation-Title": "AssetProcessor",
+		"Implementaton-Version": "1.0",
+		"Main-Class": "com.jakway.assetprocessor.Main"
+	}
+}
+
+//export the JAR to the filesystem
+//groovy will automatically export the JAR just from the task but this gives more control over its location
+def runnableJarFile = file('assetprocessor.jar')
+
+//groovy detects that it's a JAR artifact from the extension
+artifacts {
+	archives runnableJarFile
+}
