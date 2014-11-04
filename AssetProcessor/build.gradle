@@ -1,10 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'application' //allows you to create run tasks
 
 //dependencies management
 repositories {
 	mavenCentral()
 }
 
+//depends on Apache Commons IO
 dependencies {
 	compile 'commons-io:commons-io:2.4'
 }
@@ -21,41 +23,21 @@ sourceSets {
 
 
 //tasks
+//don't really need to explicitly define any tasks because the Java plugin will do everything automatically from sourceSets
 
-//don't run by default because we need external parameters
+mainClassName = "com.jakway.assetprocessor.Main"
+
 defaultTasks 'build', 'runnableJar'
-
-/*task clean << {
-
-}*/
-
-/*task build << {
-
-}*/
-
-//must build before running
-/*task run(dependsOn: 'build') << {
-
-}*/
 
 //JAR creation
 task runnableJar(type: Jar, dependsOn: 'build') {
 	manifest {
 		attributes("Implementation-Title": "AssetProcessor",
 		"Implementaton-Version": "1.0",
-		"Main-Class": "com.jakway.assetprocessor.Main")
+		"Main-Class": mainClassName)
 	}
 	//package the JAR with all dependencies
 	baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
-
-//export the JAR to the filesystem
-//groovy will automatically export the JAR just from the task but this gives more control over its location
-//def runnableJarFile = file('assetprocessor.jar')
-
-//groovy detects that it's a JAR artifact from the extension
-/*artifacts {
-	archives runnableJarFile
-}*/
