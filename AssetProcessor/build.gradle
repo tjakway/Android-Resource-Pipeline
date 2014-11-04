@@ -9,6 +9,17 @@ dependencies {
 	compile 'commons-io:commons-io:2.4'
 }
 
+//Java source sets
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		//no resources dir
+	}
+}
+
+
 //tasks
 
 //don't run by default because we need external parameters
