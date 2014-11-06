@@ -52,10 +52,11 @@ println 'ASSETPROCESSOR PROJECT OBJECT DONE'
 
 println project.getSubprojects()
 
+/*
 task run(type: Exec) {
 	//dependsOn project('AssetProcessor').runAssetProcessor
 	commandLine ''
-}
+}*/
 
 /*project('AssetProcessor')
 {

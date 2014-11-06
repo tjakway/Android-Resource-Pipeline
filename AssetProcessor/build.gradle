@@ -6,8 +6,8 @@ repositories {
 	mavenCentral()
 }
 
-//depends on Apache Commons IO
-dependencies {
+dependencies
+{
 	compile 'commons-io:commons-io:2.4'
 }
 
@@ -25,24 +25,26 @@ sourceSets {
 //tasks
 //don't really need to explicitly define any tasks because the Java plugin will do everything automatically from sourceSets
 
-mainClassName = "com.jakway.assetprocessor.Main"
-
-defaultTasks 'build'
+defaultTasks 'build', 'assetProcessorRunnableJar'
 
 //JAR creation
-task runnableJar(type: Jar, dependsOn: 'build') {
+task assetProcessorRunnableJar(type: Jar, dependsOn: 'build') {
 	manifest {
 		attributes("Implementation-Title": "AssetProcessor",
 		"Implementaton-Version": "1.0",
-		"Main-Class": mainClassName)
+		"Main-Class": "com.jakway.assetprocessor.Main")
 	}
 	//package the JAR with all dependencies
-	baseName = project.name + '-all'
+	baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+    
+	project.getRootProject().ext.set('assetProcessorRunnableJarPath', archivePath)
+	assert project.getRootProject().assetProcessorRunnableJarPath == archivePath
 }
 
+/*
 task runAssetProcessor(type: JavaExec, dependsOn: 'build') {
 	main = 'com.jakway.assetprocessor.Main'
 	args project.properties.assetProcessorSettings.getAssetIn(), project.properties.assetProcessorSettings.getAssetBin(), project.properties.assetProcessorSettings.getAssetOverwrite()
-}
+}*/
