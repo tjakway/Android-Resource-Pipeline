@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'application' //allows you to create run tasks
+//apply plugin: 'application' //allows you to create run tasks
 
 //dependencies management
 repositories {
@@ -40,4 +40,9 @@ task runnableJar(type: Jar, dependsOn: 'build') {
 	baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
+}
+
+task runAssetProcessor(type: JavaExec, dependsOn: 'build') {
+	main = 'com.jakway.assetprocessor.Main'
+	args project.properties.assetProcessorSettings.getAssetIn(), project.properties.assetProcessorSettings.getAssetBin(), project.properties.assetProcessorSettings.getAssetOverwrite()
 }
