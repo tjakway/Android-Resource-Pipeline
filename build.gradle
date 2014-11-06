@@ -13,6 +13,15 @@ class AssetProcessorSettings {
 		this.assetOverwrite = assetOverwrite;
 	}
 }
-assetProcessorSettings = new AssetProcessorSettings()
+
+//println "project properties list:\n"
+//println project.properties
+//println
+
+//println project.properties.ART_IN
+
+//Gradle has deprecated dynamic properties--all project properties should be accessed through project.ext
+//project.ext.assetProcessorSettings = new AssetProcessorSettings(project.properties.globalProperties["ART_IN"], project.properties.ART_BIN, project.properties.globalProperties.ASSET_OVERWRITE)
 
 
+project.ext.assetProcessorSettings = new AssetProcessorSettings(project.properties.GLOBAL_ART_IN, project.properties.GLOBAL_ART_BIN, project.properties.GLOBAL_ASSET_OVERWRITE)
