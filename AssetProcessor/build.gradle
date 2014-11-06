@@ -35,7 +35,8 @@ task assetProcessorRunnableJar(type: Jar, dependsOn: 'build') {
 		"Main-Class": "com.jakway.assetprocessor.Main")
 	}
 	//package the JAR with all dependencies
-	baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
+	//baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
+	baseName = project.ART_ASSET_JAR_NAME
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
     
