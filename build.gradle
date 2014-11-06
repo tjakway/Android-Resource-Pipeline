@@ -1,18 +1,38 @@
+apply plugin: 'java'
+
+
 /**
  * assetIn, assetBin are files
  * assetOverwrite is a boolean
  */
 class AssetProcessorSettings {
 	//def creates setter and getter methods
-	def assetIn, assetBin, assetOverwrite
+	String assetIn, assetBin, assetOverwrite
 
 	AssetProcessorSettings(assetIn, assetBin, assetOverwrite)
 	{
 		this.assetIn = assetIn
 		this.assetBin = assetBin
-		this.assetOverwrite = assetOverwrite;
+		if(assetOverwrite)
+		{
+			this.assetOverwrite = '--overwrite=on'
+		}
+		else
+		{
+			this.assetOverwrite = '--overwrite=off'
+		}
 	}
 }
+
+//dependsOn(':AssetProducer')
+
+
+dependencies
+{
+	project('AssetProcessor')
+}
+
+//evaluationDependsOn(':AssetProcessor')
 
 //println "project properties list:\n"
 //println project.properties
@@ -25,3 +45,24 @@ class AssetProcessorSettings {
 
 
 project.ext.assetProcessorSettings = new AssetProcessorSettings(project.properties.GLOBAL_ART_IN, project.properties.GLOBAL_ART_BIN, project.properties.GLOBAL_ASSET_OVERWRITE)
+
+println 'ASSETPROCESSOR PROJECT OBJECT'
+println project('AssetProcessor').getParent()
+println 'ASSETPROCESSOR PROJECT OBJECT DONE'
+
+println project.getSubprojects()
+
+task run(type: Exec) {
+	//dependsOn project('AssetProcessor').runAssetProcessor
+	commandLine ''
+}
+
+/*project('AssetProcessor')
+{
+
+	
+	//println project
+	
+	//println project.getSubprojects().get('AssetProcessor')
+	//project.getSubprojects()['AssetProcessor'].args = []
+} */
