@@ -36,8 +36,12 @@ task assetProcessorRunnableJar(type: Jar, dependsOn: 'build') {
 	}
 	//package the JAR with all dependencies
 	//baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
-	baseName = project.ART_ASSET_JAR_NAME
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	
+	//WARNING: CHANGED TO NOT USE TOP LEVEL PROPERTIES--JAR NAME IS NOW HARDCODED
+	//baseName = project.ART_ASSET_JAR_NAME
+        baseName = "ART_ASSET_JAR_NAME=AssetProcessor-all"
+	
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
     
 	project.getRootProject().ext.set('assetProcessorRunnableJarPath', archivePath)
