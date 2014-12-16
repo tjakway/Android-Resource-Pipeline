@@ -9,7 +9,16 @@ dependencies
 {
 	//depends on Commons IO, FOP, Batik, XML graphics commons
 	compile 'commons-io:commons-io:2.4'
-	compile 'org.apache.xmlgraphics:fop:1.1'
+	compile 'org.apache.xmlgraphics:fop:1.0' //UPDATE THIS TO FOP 1.1
+											 //HAD TO CHANGE FROM 1.1 TO 1.0 BECAUSE OF THIS BUG https://issues.sonatype.org/browse/MVNCENTRAL-322
+											 //http://mail-archives.apache.org/mod_mbox/xmlgraphics-fop-users/201008.mbox/%3C20100818082313.GB3456@leverkruid.eu%3E
+											 //http://apache-fop.1065347.n5.nabble.com/Maven-dependencies-for-fop-1-1-td37437.html
+											 //basically, fop 1.1 depends on Apache Avalon 4.2 (as of time of writing, 12/16/14,
+											 //the current version of Apache Avalon is 4.3.1) but instead of uploading the new version
+											 //alongside the old one, someone deleted Apache Avalon 4.2 so FOP can't find it
+											 //and the Apache Avalon team can't change Maven Central for some reason...
+											 //could download FOP's Maven POM and change it to depend on the new version but...
+											 //this is a tool and isn't user facing.  Hopefully it'll be fixed soon.
 	compile 'fr.avianey.apache-xmlgraphics:batik:1.8pre-20141006'
 	compile 'org.apache.xmlgraphics:xmlgraphics-commons:1.5'
 	
@@ -25,5 +34,22 @@ sourceSets {
 	}
 }
 
+//defaultTasks 'build', 'artProcessorRunnableJar'
 defaultTasks 'build', 'artProcessorRunnableJar'
 
+//JAR creation
+task artProcessorRunnableJar(type: Jar, dependsOn: 'build') {
+	manifest {
+		attributes("Implementation-Title": "ArtProcessor",
+		"Implementaton-Version": "1.0",
+		"Main-Class": "com.jakway.artprocessor.ArtProcessorMain")
+	}
+	//package the JAR with all dependencies
+	//baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
+	baseName = "art_processor.jar"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+    
+	//project.getRootProject().ext.set('assetProcessorRunnableJarPath', archivePath)
+	//assert project.getRootProject().assetProcessorRunnableJarPath == archivePath
+}
