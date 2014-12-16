@@ -39,7 +39,7 @@ task assetProcessorRunnableJar(type: Jar, dependsOn: 'build') {
 	
 	//WARNING: CHANGED TO NOT USE TOP LEVEL PROPERTIES--JAR NAME IS NOW HARDCODED
 	//baseName = project.ART_ASSET_JAR_NAME
-        baseName = "AssetProcessor-all.jar"
+        baseName = "AssetProcessor-all"
 	
 	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar

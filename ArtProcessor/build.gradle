@@ -46,7 +46,7 @@ task artProcessorRunnableJar(type: Jar, dependsOn: 'build') {
 	}
 	//package the JAR with all dependencies
 	//baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
-	baseName = "art_processor.jar"
+	baseName = "art_processor"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
     
