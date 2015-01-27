@@ -21,7 +21,7 @@ dependencies
 											 //this is a tool and isn't user facing.  Hopefully it'll be fixed soon.
 	compile 'fr.avianey.apache-xmlgraphics:batik:1.8pre-20141006'
 	compile 'org.apache.xmlgraphics:xmlgraphics-commons:1.5'
-	
+	compile 'com.beust:jcommander:1.47' //command line option handling	
 }
 
 //Java source sets
