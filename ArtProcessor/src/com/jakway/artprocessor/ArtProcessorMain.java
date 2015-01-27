@@ -59,7 +59,7 @@ public class ArtProcessorMain
 		//SVGValidator validator = new SVGValidator(svgFiles, new TerminatingArtProcessorErrorHandler("SVGValidator"));
 		//validator.validateSVGs();
 		
-		ArtProcessorTranscoder transcoder = new ArtProcessorTranscoder(outputDir, svgFiles, new TranscoderErrorHandler("ArtProcessorTranscoder", outputDir));
+		ArtProcessorTranscoder transcoder = new ArtProcessorTranscoder(options.getOutput(), svgFiles, new TranscoderErrorHandler("ArtProcessorTranscoder", options.getOutput()));
 		transcoder.convertAndWriteSVGs();
 	}
 }
