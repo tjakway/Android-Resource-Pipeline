@@ -5,5 +5,5 @@ This project exists to reduce the irritation of dealing with Android screen dens
 
 TODO:
 -----------------------
-1. Convert all projects to use Apache Commons CLI for more standard command line handling.
+1. Convert all projects to use JCommander for more standard command line handling.
 2. Integrate with gradle as a task.
