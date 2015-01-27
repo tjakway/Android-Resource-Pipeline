@@ -34,7 +34,6 @@ sourceSets {
 	}
 }
 
-//defaultTasks 'build', 'artProcessorRunnableJar'
 defaultTasks 'build', 'artProcessorRunnableJar'
 
 //JAR creation
@@ -45,11 +44,8 @@ task artProcessorRunnableJar(type: Jar, dependsOn: 'build') {
 		"Main-Class": "com.jakway.artprocessor.ArtProcessorMain")
 	}
 	//package the JAR with all dependencies
-	//baseName = getJarName(project) //because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
+	//because this is a subproject, just passing project will always get the correct name--no need to use project('AssetProcessor')
 	baseName = "art_processor"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
-    
-	//project.getRootProject().ext.set('assetProcessorRunnableJarPath', archivePath)
-	//assert project.getRootProject().assetProcessorRunnableJarPath == archivePath
 }
