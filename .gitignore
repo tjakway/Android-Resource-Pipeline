@@ -2,3 +2,9 @@ art_out
 art_bin
 assets
 values_bin
+#ignore swap files
+*.swp
+#ignore eclipse project files
+.project
+.classpath
+.settings
