@@ -24,9 +24,9 @@ public class ArtProcessorMain
 
 		if(options.getOverwrite())
 		{
-			System.out.println("overwrite option recognized.  Deleting output directory "+options.getOutput());
+			System.out.println("overwrite option recognized.  Deleting output directory "+options.getOutputDir());
 			try {
-			FileUtils.deleteDirectory(options.getOutput());
+			FileUtils.deleteDirectory(options.getOutputDir());
 			}
 			catch(IOException e)
 			{
@@ -35,23 +35,23 @@ public class ArtProcessorMain
 			}
 		}
 
-		if(!options.getInput().exists())
+		if(!options.getInputDir().exists())
 		{
-			System.err.println("input dir "+options.getInput()+"doesnt exist!");
+			System.err.println("input dir "+options.getInputDir()+"doesnt exist!");
 			System.exit(1);
 		}
 
 		//output dir doesn't exist--try to create it
-		if(!options.getOutput().exists())
+		if(!options.getOutputDir().exists())
 		{
-			if(!options.getOutput().mkdir())
+			if(!options.getOutputDir().mkdir())
 			{
-				System.err.println("output dir "+options.getOutput()+" does not exist and could not be created!");	
+				System.err.println("output dir "+options.getOutputDir()+" does not exist and could not be created!");	
 				System.exit(1);
 			}
 		}
 
-		FileSystemChecker checker = new FileSystemChecker(options.getInput(), new TerminatingArtProcessorErrorHandler("FileSystemChecker"));
+		FileSystemChecker checker = new FileSystemChecker(options.getInputDir(), new TerminatingArtProcessorErrorHandler("FileSystemChecker"));
 		
 		ArrayList<File> svgFiles = checker.checkFiles();
 		
@@ -59,7 +59,7 @@ public class ArtProcessorMain
 		//SVGValidator validator = new SVGValidator(svgFiles, new TerminatingArtProcessorErrorHandler("SVGValidator"));
 		//validator.validateSVGs();
 		
-		ArtProcessorTranscoder transcoder = new ArtProcessorTranscoder(options.getOutput(), svgFiles, new TranscoderErrorHandler("ArtProcessorTranscoder", options.getOutput()));
+		ArtProcessorTranscoder transcoder = new ArtProcessorTranscoder(options.getOutputDir(), svgFiles, new TranscoderErrorHandler("ArtProcessorTranscoder", options.getOutputDir()));
 		transcoder.convertAndWriteSVGs();
 	}
 }
