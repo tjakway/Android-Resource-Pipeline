@@ -5,15 +5,15 @@ import com.beust.jcommander.Parameter;
 
 public class Options
 {
-	@Parameter(names = { "in", "input", "input-folder" }, description="Input folder containing source images", converter = FileConverter.class)
+	@Parameter(names = { "in", "input", "input-folder" }, required = true, description="Input folder containing source images", converter = FileConverter.class)
 	private File input;
 
 	
-	@Parameter(names = { "out", "output", "output-folder" }, description="Input folder containing source images", converter = FileConverter.class)
+	@Parameter(names = { "out", "output", "output-folder" }, required = true, description="Input folder containing source images", converter = FileConverter.class)
 	private File output;
 
 	@Parameter(names="overwrite", required = false, description="Delete the output folder before writing.  WARNING: the passed output directory will be deleted if any errors are detected during export")
-	private boolean overwrite;
+	private boolean overwrite=false;
 
 	/**
 	 * @return the input

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.io.FileUtils;
 
+import com.beust.jcommander.JCommander;
 import com.jakway.artprocessor.errorhandler.TerminatingArtProcessorErrorHandler;
 import com.jakway.artprocessor.errorhandler.TranscoderErrorHandler;
 import com.jakway.artprocessor.file.FileSystemChecker;
@@ -15,62 +16,42 @@ import com.jakway.artprocessor.transcoder.ArtProcessorTranscoder;
 
 public class ArtProcessorMain
 {	
-	private static final String USAGE="Arguments:\n1. The input directory containing only SVG images and no subdirectories.\n2. The output directory to write bitmaps to." +
-			"optional arg: --overwrite=on to delete the output directory before writing." +
-			"WARNING: the passed output directory will be deleted if any errors are detected during export";
-	
-	private static final int MIN_ARGS=2, MAX_ARGS=3;
-	private static final String OVERWRITE_OPTION="--overwrite=on";
-	private static final int EXIT_FAILURE=1;
-	
 	public static void main(String args[]) throws TranscoderException, FileNotFoundException
 	{
-		File inputDir = null,
-				outputDir = null;
-		
-		if(args.length < MIN_ARGS || args.length > MAX_ARGS)
+		Options options = new Options();	
+	
+		new JCommander(options, args);
+
+		if(options.getOverwrite())
 		{
-			System.out.println(USAGE);
-			System.exit(EXIT_FAILURE);
-		}
-		
-		inputDir = new File(args[0]);
-		outputDir = new File(args[1]);
-		
-		//optional argument was passed
-		if(args.length == 3)
-		{
-			String optionalArg = args[2];
-			if(!optionalArg.equals(OVERWRITE_OPTION))
-			{
-				System.out.println("Didn't recognize 3rd optional argument.");
-				System.out.println(USAGE);
-				System.exit(EXIT_FAILURE);
+			System.out.println("overwrite option recognized.  Deleting output directory "+options.getOutput());
+			try {
+			FileUtils.deleteDirectory(options.getOutput());
 			}
-			else
+			catch(IOException e)
 			{
-				System.out.println("--overwrite-on recognized.  Deleting output directory "+outputDir.toString());
-				//overwite on
-				//delete the output dir
-				//outputDir.delete();
-				try {
-				FileUtils.deleteDirectory(outputDir);
-				}
-				catch(IOException e)
-				{
-					System.err.println("ERROR: Could not delete output directory!");
-					System.exit(EXIT_FAILURE);
-				}
+				System.err.println("ERROR: Could not delete output directory!");
+				System.exit(1);
 			}
 		}
-		
-		if(!inputDir.exists())
+
+		if(!options.getInput().exists())
 		{
-			System.err.println("input dir "+inputDir+"doesnt exist!");
+			System.err.println("input dir "+options.getInput()+"doesnt exist!");
 			System.exit(1);
 		}
-		
-		FileSystemChecker checker = new FileSystemChecker(inputDir, new TerminatingArtProcessorErrorHandler("FileSystemChecker"));
+
+		//output dir doesn't exist--try to create it
+		if(!options.getOutput().exists())
+		{
+			if(!options.getOutput().mkdir())
+			{
+				System.err.println("output dir "+options.getOutput()+" does not exist and could not be created!");	
+				System.exit(1);
+			}
+		}
+
+		FileSystemChecker checker = new FileSystemChecker(options.getInput(), new TerminatingArtProcessorErrorHandler("FileSystemChecker"));
 		
 		ArrayList<File> svgFiles = checker.checkFiles();
 		
