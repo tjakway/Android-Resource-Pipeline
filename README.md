@@ -6,7 +6,7 @@ This project exists to reduce the irritation of dealing with Android screen dens
 Status
 -----------------------
 Still in beta.
-Most of the hard work is done (like the Batik code to convert SVG -> PNG), but it still needs a lot of polish (especially with gradle).
+Most of the hard work is done (like the Batik code to convert SVG -> PNG), but it needs a lot of polish (especially with gradle).
 
 TODO:
 -----------------------
