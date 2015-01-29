@@ -12,3 +12,7 @@ TODO:
 -----------------------
 1. Convert all projects to use JCommander for more standard command line handling.
 2. Integrate with gradle as a task.
+
+License:
+-----------------------
+The Android Resource Pipline is licensed under a permissive open source license (Apache 2).
