@@ -15,4 +15,4 @@ TODO:
 
 License:
 -----------------------
-The Android Resource Pipline is licensed under a permissive open source license (Apache 2).
+The Android Resource Pipeline is licensed under a permissive open source license (Apache 2).
