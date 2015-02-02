@@ -1,7 +1,12 @@
 package com.jakway.artprocessor.test;
 
-class BlackBoxTests
+import org.junit.Test;
+
+public class BlackBoxTests
 {
+    public BlackBoxTests()
+    { }
+
     @Test
     public void initialTest()
     {
