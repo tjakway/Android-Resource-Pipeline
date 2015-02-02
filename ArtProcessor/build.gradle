@@ -22,6 +22,8 @@ dependencies
 	compile 'fr.avianey.apache-xmlgraphics:batik:1.8pre-20141006'
 	compile 'org.apache.xmlgraphics:xmlgraphics-commons:1.5'
 	compile 'com.beust:jcommander:1.47' //command line option handling	
+        //testing dependencies
+        testCompile 'junit:junit:4.12'
 }
 
 //Java source sets
