@@ -28,7 +28,7 @@ dependencies
 sourceSets {
 	main {
 		java {
-			srcDir 'src/java'
+			srcDir 'src/main/java'
 		}
 		//no resources dir
 	}
