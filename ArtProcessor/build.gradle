@@ -1,5 +1,9 @@
 apply plugin: 'java'
+apply plugin: 'application'
 apply plugin: 'eclipse'
+
+//needed for the 'run' gradle task from the application plugin
+mainClassName = "com.jakway.artprocessor.ArtProcessorMain"
 
 //dependencies management
 repositories {
