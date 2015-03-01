@@ -12,7 +12,7 @@ public class Options
 	@Parameter(names = { "-out", "--output", "output-folder" }, required = true, description="Input folder containing source images", converter = FileConverter.class)
 	private File outputDir;
 
-	@Parameter(names="--overwrite", required = false, description="Delete the output folder before writing.  WARNING: the passed output directory will be deleted if any errors are detected during export")
+	@Parameter(names="--overwrite", arity = 1, required = false, description="Delete the output folder before writing.  WARNING: the passed output directory will be deleted if any errors are detected during export")
 	private boolean overwrite=false;
 
 	/**
